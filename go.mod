@@ -1,3 +1,3 @@
-module github.com/JJBordy/simple-rules.git
+module github.com/JJBordy/rules.git
 
 go 1.21
