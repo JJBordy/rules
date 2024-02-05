@@ -11,7 +11,7 @@ type YAML struct {
 
 	Contains []string `yaml:"CONTAINS"`
 
-	Output map[string]string `yaml:"OUTPUT"`
+	Output map[string]interface{} `yaml:"OUTPUT"`
 
 	MapID string                 `yaml:"MAP-ID"`
 	Map   map[string]interface{} `yaml:"MAP"`

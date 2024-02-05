@@ -6,13 +6,17 @@
     - customer.balance.usd > 10
     - customer.name == $customer.surname
   OUTPUT:
-    promote.status: VIP
+    promote:
+      status: VIP
 - name: if vip do some other stuff too
   AND:
     - rule:some-rule-id
     - customer.name == Karen
   OUTPUT:
-    label.update: hassle
+    label:
+      update: now
+      and:
+        here: 10
 - MAP-ID: some-map-id
   MAP:
     blue: 3
@@ -48,7 +52,6 @@
   OUTPUT-APPEND:
     output: some.array.here[*]
     append:
-      some.stuff.here: 12
-      another.stuff: red
-      is.here.it: 11
-      is.here.there: 49
+      - some:
+        stuff: here
+        and: [here, is, too]

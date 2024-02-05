@@ -44,9 +44,37 @@ func TestRuleReading(t *testing.T) {
 
 	fmt.Printf("result: %+v\n", result)
 
+	var dat string = `
+entries: 
+  - keya1: val1
+    keya2: val2
+  - keyb1: val1
+    keyb2: val2
+  - val3
+new:
+  stuff:
+    here: 10`
+
+	yaml2 := `
+some:
+  nr: 4
+other:
+  stuff: here`
+
+	totalResult := make(map[string]interface{})
+
+	err = yaml.Unmarshal([]byte(dat), &totalResult)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = yaml.Unmarshal([]byte(yaml2), &totalResult)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("RESULT: %+v\n", totalResult)
 }
 
-func evaluate(data map[string]interface{}, rule YAML, output map[string]interface{}) ([][2]string, error) {
+func evaluate(data map[string]interface{}, rule YAML, output map[string]interface{}) (map[string]interface{}, error) {
 
 	var allTrue int
 
@@ -85,13 +113,13 @@ func evaluate(data map[string]interface{}, rule YAML, output map[string]interfac
 		return nil, nil
 	}
 
-	finalOutput := make([][2]string, 0)
+	//finalOutput := make([][2]string, 0)
 
-	for path, value := range rule.Output {
-		finalOutput = append(finalOutput, [2]string{path, value})
-	}
+	//for path, value := range rule.Output {
+	//	finalOutput = append(finalOutput, [2]string{path, value})
+	//}
 
-	return finalOutput, nil
+	return output, nil
 }
 
 func extractFieldVal(path string, input map[string]interface{}) string {
