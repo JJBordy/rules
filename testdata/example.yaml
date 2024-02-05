@@ -1,0 +1,54 @@
+- name: set customer as VIP
+  priority: 90
+  id: some-rule-id
+  AND_MIN: 2
+  AND:
+    - customer.balance.usd > 10
+    - customer.name == $customer.surname
+  OUTPUT:
+    promote.status: VIP
+- name: if vip do some other stuff too
+  AND:
+    - rule:some-rule-id
+    - customer.name == Karen
+  OUTPUT:
+    label.update: hassle
+- MAP-ID: some-map-id
+  MAP:
+    blue: 3
+    red: 5
+    black: 43
+    yellow: 11
+- name: customer business card color
+  OR:
+    - customer.payment.cards[*] ANY-EQUAL (visa gold, mastercard cold, revolut premium)
+    - customer.age > 21
+    - customer.salary > 400000
+    - customer.hair.color == blue
+  OUTPUT-MAP:
+    - input: car.windshield.size
+      output: car.color
+      map: some-map-id
+- name: validate
+  CONTAINS:
+    - car.color
+    - car.size
+    - car.brand
+  OUTPUT:
+    valid: true
+- name: another
+  id: another-id
+  OR:
+    - rule:id-of-rule
+    - some.input.here == some value
+  OUTPUT:
+    car.some.color: blue
+    car.some.stuff: 12
+    car.trunk.really: classy
+  OUTPUT-APPEND:
+    output: some.array.here[*]
+    append:
+      some.stuff.here: 12
+      another.stuff: red
+      is.here.it: 11
+      is.here.there: 49
