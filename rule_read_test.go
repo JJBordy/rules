@@ -1,4 +1,4 @@
-package rule
+package rules
 
 import (
 	"fmt"
@@ -11,12 +11,12 @@ import (
 
 func TestRuleReading(t *testing.T) {
 
-	c, err := os.ReadFile("../testdata/example.yaml")
+	c, err := os.ReadFile("testdata/example.yaml")
 	if err != nil {
 		t.Fatal("could not read yaml file")
 	}
 
-	var rules []YAML
+	var rules []YAMLRule
 
 	err = yaml.Unmarshal(c, &rules)
 	if err != nil {
@@ -33,6 +33,11 @@ func TestRuleReading(t *testing.T) {
 			"name":    "John",
 			"surname": "John",
 		},
+		"some": map[string]interface{}{
+			"field": map[string]interface{}{
+				"like this": "this thing",
+			},
+		},
 	}
 
 	output := make(map[string]interface{})
@@ -44,37 +49,40 @@ func TestRuleReading(t *testing.T) {
 
 	fmt.Printf("result: %+v\n", result)
 
-	var dat string = `
-entries: 
-  - keya1: val1
-    keya2: val2
-  - keyb1: val1
-    keyb2: val2
-  - val3
-new:
-  stuff:
-    here: 10`
-
-	yaml2 := `
-some:
-  nr: 4
-other:
-  stuff: here`
-
-	totalResult := make(map[string]interface{})
-
-	err = yaml.Unmarshal([]byte(dat), &totalResult)
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = yaml.Unmarshal([]byte(yaml2), &totalResult)
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Printf("RESULT: %+v\n", totalResult)
 }
 
-func evaluate(data map[string]interface{}, rule YAML, output map[string]interface{}) (map[string]interface{}, error) {
+func TestAppend(t *testing.T) {
+	yamA := `
+some:
+  stuff: true
+  things:
+    look: nice
+    are: [good]
+`
+
+	yamB := `
+some:
+  otherStuff: false
+  things:
+    seem: cool
+    are: [bad]
+`
+
+	var result map[string]interface{}
+
+	err := yaml.Unmarshal([]byte(yamA), &result)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = yaml.Unmarshal([]byte(yamB), &result)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Printf("%+v\n", result)
+}
+
+func evaluate(data map[string]interface{}, rule YAMLRule, output map[string]interface{}) (map[string]interface{}, error) {
 
 	var allTrue int
 

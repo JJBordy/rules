@@ -1,4 +1,4 @@
-package rule
+package rules
 
 type Rule struct {
 	Name           string

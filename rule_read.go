@@ -1,6 +1,6 @@
-package rule
+package rules
 
-type YAML struct {
+type YAMLRule struct {
 	Name     string `yaml:"name"`
 	ID       string `yaml:"ID"`
 	Priority int    `yaml:"priority"`
@@ -18,7 +18,7 @@ type YAML struct {
 
 	OutputMap []OutputMapYAML `yaml:"OUTPUT-MAP"`
 
-	OutputAppend OutputAppend `yaml:"OUTPUT-APPEND"`
+	OutputAppend OutputAppendYAML `yaml:"OUTPUT-APPEND"`
 }
 
 type OutputAppendYAML struct {
