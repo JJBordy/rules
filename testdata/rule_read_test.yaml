@@ -10,6 +10,7 @@
     - input: customer.name
       EQUAL: [ $customer.surname ]
       EQUAL_ANY: [ "Ion", "Vasile", "George" ]
+  OUTPUT_VALIDATION: validation.output.here
 - name: customer business card color
   MAP:
     3: blue
