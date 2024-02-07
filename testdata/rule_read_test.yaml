@@ -1,0 +1,18 @@
+- name: Rule Name
+  id: rule-id
+  priority: 10
+  COND_MIN: 2
+  COND_CHAIN: AND
+  COND:
+    - input: customer.balance.usd
+      GREATER: [ 10 ]
+      LESS_THAN: [ 100 ]
+    - input: customer.name
+      EQUAL: [ $customer.surname ]
+      EQUAL_ANY: [ "Ion", "Vasile", "George" ]
+- name: customer business card color
+  MAP:
+    3: blue
+    5: red
+  OUTPUT_MAP:
+    file.color: $car.windshield.size

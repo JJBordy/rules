@@ -1,27 +1,28 @@
 - name: set customer as VIP
-  priority: 90
   id: some-rule-id
+  priority: 90
   COND_MIN: 2
   COND_CHAIN: AND
   COND:
-    - input: [ customer.balance.usd, customer.balance.eur ]
+    - input: customer.balance.usd
       GREATER: [ 10 ]
       LESS_THAN: [ 100 ]
-    - input: [ customer.name ]
+    - input: customer.name
       EQUAL: [ $customer.surname ]
       EQUAL_ANY: [ "Ion", "Vasile", "George" ]
     - input: customer.membership
       EQUAL: [ "REGULAR" ]
-    - NOT_EMPTY: [ $customer.bank.card ]
-    - RULES: [ some-rule-id ]
-    - input: [ "customer.familyMembers[*].age" ]
+    - NOT_EMPTY: $customer.bank.card
+    - RULE: some-rule-id
+    - input: "customer.familyMembers[*].age"
       GT: [ 18 ]
       COUNT: [ 10 ]
-    - path: [ customer.age ]
+    - input: customer.age
       BETWEEN: [ 18, 100 ]
   OUTPUT:
     promote.status: vip
-    performance.indicators: [ "good boy" ]
+    performance.indicators: [ "good boy", "super man" ]
+  OUTPUT_VALIDATION: validation.output.here
 - name: customer business card color
   MAP:
     3: blue
