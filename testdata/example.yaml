@@ -14,9 +14,9 @@
       EQUAL: [ "REGULAR" ]
     - NOT_EMPTY: $customer.bank.card
     - RULE: some-rule-id
-    - input: "customer.familyMembers[*].age"
+    - inputList: customer.familyMembers[*].age
+      listMin: 3
       GT: [ 18 ]
-      COUNT: [ 10 ]
     - input: customer.age
       BETWEEN: [ 18, 100 ]
   OUTPUT:

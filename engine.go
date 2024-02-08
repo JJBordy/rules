@@ -30,7 +30,9 @@ func (e *Engine) EvaluateSet(setName string, input map[string]interface{}) (map[
 		if err != nil {
 			return nil, err
 		}
-		outputs = append(outputs, output)
+		if output != nil {
+			outputs = append(outputs, output)
+		}
 	}
 
 	return BuildOutput(outputs)

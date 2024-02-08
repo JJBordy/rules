@@ -1,5 +1,10 @@
 package rules
 
+import (
+	"fmt"
+	"strings"
+)
+
 type RuleInput struct {
 	Name     string `yaml:"name"`
 	ID       string `yaml:"id"`
@@ -17,6 +22,7 @@ type RuleInput struct {
 }
 
 type ConditionFunc func(input any, args []any) (bool, error)
+type ConditionFuncOfList func(inputs []any, args []any) (bool, error)
 
 type Rule struct {
 	Name     string
@@ -31,6 +37,10 @@ type Rule struct {
 
 	Output    map[string]interface{}
 	OutputMap map[string]interface{}
+}
+
+func ParseRuleInput(ruleInput RuleInput) (Rule, error) {
+	return Rule{}, nil
 }
 
 func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface{}, error) {
@@ -51,11 +61,55 @@ type ConditionChain interface { // may have condition chain type - as interface
 	EvaluateConditions(input map[string]interface{}, conditions []Condition) (bool, error)
 }
 
-type Condition struct {
-	inputValue     any
-	conditionFuncs []ConditionFunc
+func ConditionChainAnd(input map[string]interface{}, conditions []Condition) (bool, error) {
+	passedConditions := 0
+
+	for _, condition := range conditions {
+		passed, err := condition.Evaluate(input)
+		if err != nil {
+			return false, err
+		}
+		if passed {
+			passedConditions++
+		}
+	}
+
+	return passedConditions == len(conditions), nil
 }
 
-func ParseRuleInput(ruleInput RuleInput) (Rule, error) {
-	return Rule{}, nil
+type Condition struct {
+	inputPath          string
+	args               []any
+	conditionFuncs     []ConditionFunc
+	conditionFuncsList []ConditionFuncOfList
+}
+
+func (c Condition) Evaluate(input map[string]interface{}) (bool, error) {
+	passedFunctions := 0
+
+	for _, conditionFunction := range c.conditionFuncs {
+		// condition func for list vs condition func for single item
+		valid, err := conditionFunction(extractFieldVal(c.inputPath, input), c.args)
+		if err != nil {
+			return false, err
+		}
+		if valid {
+			passedFunctions++
+		}
+	}
+	return passedFunctions == len(c.conditionFuncs), nil
+}
+
+func extractFieldVal(path string, input map[string]interface{}) string {
+	// TODO: will need another one to extract from arrays
+	workMap := input
+	for _, fieldName := range strings.Split(path, ".") {
+		if val, ok := workMap[fieldName].(map[string]interface{}); ok {
+			workMap = val
+		} else {
+			return fmt.Sprint(workMap[fieldName])
+		}
+	}
+
+	return ""
 }
