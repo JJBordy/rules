@@ -4,6 +4,10 @@
   COND_MIN: 2
   COND_CHAIN: AND
   COND:
+    - inputs: customer.familyMembers.extendedInfo.pets.age
+      LIST_GT_ATLEAST: [ 3, 2 ]
+    - inputs: vipCustomers[*].cars[*].color.shades[*].accent
+      LIST_CONTAINS_ANY: [ "blue", "green" ]
     - input: customer.balance.usd
       GREATER: [ 10 ]
       LESS_THAN: [ 100 ]
@@ -12,11 +16,11 @@
       EQUAL_ANY: [ "Ion", "Vasile", "George" ]
     - input: customer.membership
       EQUAL: [ "REGULAR" ]
-    - NOT_EMPTY: $customer.bank.card
+    - input: customer.bank.card
+      NONEMPTY: [ ]
     - RULE: some-rule-id
-    - inputList: customer.familyMembers[*].age
-      listMin: 3
-      GT: [ 18 ]
+    - inputs: customer.familyMembers[*].age
+      LIST_ALL_GT: [ 18 ]
     - input: customer.age
       BETWEEN: [ 18, 100 ]
   OUTPUT:

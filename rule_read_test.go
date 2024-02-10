@@ -1,8 +1,8 @@
 package rules
 
 import (
-	"github.com/JJBordy/rules.git/test"
-	"github.com/go-yaml/yaml"
+	"github.com/JJBordy/rules/test"
+	"gopkg.in/yaml.v2"
 	"os"
 	"testing"
 )
@@ -42,6 +42,44 @@ func TestRuleReading(t *testing.T) {
 	test.AssertEqual(exampleRule2.Name, "customer business card color", t)
 	test.AssertEqual(exampleRule2.Map, map[int]string{3: "blue", 5: "red"}, t)
 	test.AssertEqual(exampleRule2.OutputMap, map[string]string{"file.color": "$car.windshield.size"}, t)
+}
+
+func TestExtractList(t *testing.T) {
+	input := map[string]interface{}{
+		"customer": map[string]interface{}{
+			"familyMembers": []map[string]interface{}{
+				{
+					"name": "Margaret",
+					"permit": map[string]interface{}{
+						"pets": []map[string]interface{}{
+							{
+								"name":       "Max",
+								"vaccinated": true,
+							},
+							{
+								"name":       "George",
+								"vaccinated": false,
+							},
+						},
+					}},
+				{
+					"name": "Peter",
+					"permit": map[string]interface{}{
+						"pets": []map[string]interface{}{
+							{
+								"name":       "Dory",
+								"vaccinated": true,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	path := "customer.familyMembers.permit.pets.name"
+	result := extractAsList(path, input)
+	test.AssertEqual(result, []any{"Max", "George", "Dory"}, t)
 }
 
 //func TestAppend(t *testing.T) {

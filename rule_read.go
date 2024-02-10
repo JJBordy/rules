@@ -88,7 +88,6 @@ func (c Condition) Evaluate(input map[string]interface{}) (bool, error) {
 	passedFunctions := 0
 
 	for _, conditionFunction := range c.conditionFuncs {
-		// condition func for list vs condition func for single item
 		valid, err := conditionFunction(extractFieldVal(c.inputPath, input), c.args)
 		if err != nil {
 			return false, err
@@ -97,19 +96,95 @@ func (c Condition) Evaluate(input map[string]interface{}) (bool, error) {
 			passedFunctions++
 		}
 	}
+
+	for _, conditionFunctionOfList := range c.conditionFuncsList {
+		valid, err := conditionFunctionOfList(extractFieldListValues(c.inputPath, input), c.args)
+		if err != nil {
+			return false, err
+		}
+		if valid {
+			passedFunctions++
+		}
+	}
+
 	return passedFunctions == len(c.conditionFuncs), nil
+}
+func extractFieldListValues(listPath string, input map[string]interface{}) []any {
+
+	lastIsList := false
+	if strings.HasSuffix(listPath, "[*]") {
+		lastIsList = true
+	}
+	lastI := len(strings.Split(listPath, "[*]")) - 1
+
+	//resultsArray := make([]any, 0)
+	pathsToLists := strings.Split(listPath, "[*]")
+	for i, pathToList := range pathsToLists {
+		workMap := input
+		for _, fieldName := range strings.Split(pathToList, ".") {
+			if val, ok := workMap[fieldName].(map[string]interface{}); ok {
+				workMap = val
+			} else if arr, ok := workMap[fieldName].([]any); ok {
+				//resultsArray = append(resultsArray, extractAsList(fieldName, arr))
+				return arr
+			} else {
+				return []any{workMap[fieldName]}
+			}
+		}
+		if i == lastI && lastIsList {
+			// process the last one as a list
+		}
+	}
+
+	return nil
+}
+
+type ExtractResult struct {
+	List  []any
+	Value string
+}
+
+func extractAsList(path string, input map[string]interface{}) []any {
+
+	fullPath := strings.Split(path, ".")
+	resultingArray := make([]any, 0)
+	workMap := input
+
+	for pi, pathElem := range fullPath {
+		if mp, ok := workMap[pathElem].(map[string]interface{}); ok {
+			workMap = mp
+		} else if arr, ok := workMap[pathElem].([]map[string]interface{}); ok {
+			for _, arrElem := range arr {
+				resultingArray = append(resultingArray, extractAsList(strings.Join(fullPath[pi+1:], "."), arrElem)...)
+			}
+		} else {
+			resultingArray = append(resultingArray, workMap[pathElem])
+		}
+	}
+
+	cleanedArray := make([]any, 0)
+	for _, elem := range resultingArray {
+		if elem != nil {
+			cleanedArray = append(cleanedArray, elem)
+		}
+	}
+
+	return cleanedArray
 }
 
 func extractFieldVal(path string, input map[string]interface{}) string {
-	// TODO: will need another one to extract from arrays
 	workMap := input
 	for _, fieldName := range strings.Split(path, ".") {
-		if val, ok := workMap[fieldName].(map[string]interface{}); ok {
-			workMap = val
+		if innerMap, ok := workMap[fieldName].(map[string]interface{}); ok {
+			workMap = innerMap
 		} else {
 			return fmt.Sprint(workMap[fieldName])
 		}
 	}
 
 	return ""
+}
+
+func (c Condition) Validate(input map[string]interface{}) error {
+	return nil
 }
