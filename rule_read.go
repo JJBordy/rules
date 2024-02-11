@@ -1,7 +1,6 @@
 package rules
 
 import (
-	"errors"
 	"strings"
 )
 
@@ -36,42 +35,6 @@ type Rule struct {
 
 	Output    map[string]interface{}
 	OutputMap map[string]string
-}
-
-func ParseRuleInput(ruleInput RuleInput) (Rule, error) {
-	rule := Rule{
-		Name:      ruleInput.Name,
-		ID:        ruleInput.ID,
-		Map:       ruleInput.Map,
-		Output:    ruleInput.Output,
-		OutputMap: ruleInput.OutputMap,
-	}
-
-	switch ruleInput.ConditionsChain {
-	case "AND":
-		rule.conditionChain = ConditionChainAnd{}
-	case "OR":
-		rule.conditionChain = ConditionChainOr{}
-	default:
-		rule.conditionChain = ConditionChainAnd{}
-	}
-
-	// if OUTPUT_MAP
-	// if OUTPUT_VALIDATION
-	// if OUTPUT
-
-	rule.conditions = make([]Condition, 0)
-	for _, conditionInput := range ruleInput.Conditions {
-		if singleInput, ok := conditionInput["input"]; ok {
-
-		} else if listInput, ok := conditionInput["inputs"]; ok {
-
-		} else {
-			return rule, errors.New("invalid condition: no input")
-		}
-	}
-
-	return rule, nil
 }
 
 func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface{}, error) {
