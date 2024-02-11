@@ -1,11 +1,13 @@
 - name: set customer as VIP
   id: some-rule-id
-  priority: 90
+  priority: 3
   COND_MIN: 2
   COND_CHAIN: AND
   COND:
-    - inputs: customer.familyMembers.extendedInfo.pets.age
+    - inputs: customer.familyMembers[*].extendedInfo.pets[*].age
       LIST_GT_ATLEAST: [ 3, 2 ]
+      LIST_COUNT_GT: [ 4 ]
+      LIST_CONTAINS_ALL: [ "powebank", "graphics card" ]
     - inputs: vipCustomers[*].cars[*].color.shades[*].accent
       LIST_CONTAINS_ANY: [ "blue", "green" ]
     - input: customer.balance.usd
@@ -18,14 +20,14 @@
       EQUAL: [ "REGULAR" ]
     - input: customer.bank.card
       NONEMPTY: [ ]
-    - RULE: some-rule-id
+#    - RULE: some-rule-id # in a later version will support referencing rules & the resulting output
     - inputs: customer.familyMembers[*].age
       LIST_ALL_GT: [ 18 ]
     - input: customer.age
       BETWEEN: [ 18, 100 ]
   OUTPUT:
     promote.status: vip
-    performance.indicators: [ "good boy", "super man" ]
+    performance.indicators: [ "good boy", "super man" ] # specify to append or replace
   OUTPUT_VALIDATION: validation.output.here
 - name: customer business card color
   MAP:
@@ -34,5 +36,8 @@
     6: green
     8: aqua
   OUTPUT_MAP:
+    # maybe use just one output; with optional parameter: validation, map, etc
+    # also: lists append / lists replace
+    # in future releases, specify the output with @promote.status.vip then it will make a tree...
     file.color: $car.windshield.size
     design.roof.shadow: $car.wheels.shadow

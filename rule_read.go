@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"errors"
 	"strings"
 )
 
@@ -9,9 +10,8 @@ type RuleInput struct {
 	ID       string `yaml:"id"`
 	Priority int    `yaml:"priority"`
 
-	ConditionsChain   string                   `yaml:"COND_CHAIN"`
-	ConditionsMinimum int                      `yaml:"COND_MIN"`
-	Conditions        []map[string]interface{} `yaml:"COND"`
+	ConditionsChain string                   `yaml:"COND_CHAIN"`
+	Conditions      []map[string]interface{} `yaml:"COND"`
 
 	Output           map[string]interface{} `yaml:"OUTPUT"`
 	OutputValidation string                 `yaml:"OUTPUT_VALIDATION"`
@@ -35,14 +35,50 @@ type Rule struct {
 	Map map[string]interface{}
 
 	Output    map[string]interface{}
-	OutputMap map[string]interface{}
+	OutputMap map[string]string
 }
 
 func ParseRuleInput(ruleInput RuleInput) (Rule, error) {
-	return Rule{}, nil
+	rule := Rule{
+		Name:      ruleInput.Name,
+		ID:        ruleInput.ID,
+		Map:       ruleInput.Map,
+		Output:    ruleInput.Output,
+		OutputMap: ruleInput.OutputMap,
+	}
+
+	switch ruleInput.ConditionsChain {
+	case "AND":
+		rule.conditionChain = ConditionChainAnd{}
+	case "OR":
+		rule.conditionChain = ConditionChainOr{}
+	default:
+		rule.conditionChain = ConditionChainAnd{}
+	}
+
+	// if OUTPUT_MAP
+	// if OUTPUT_VALIDATION
+	// if OUTPUT
+
+	rule.conditions = make([]Condition, 0)
+	for _, conditionInput := range ruleInput.Conditions {
+		if singleInput, ok := conditionInput["input"]; ok {
+
+		} else if listInput, ok := conditionInput["inputs"]; ok {
+
+		} else {
+			return rule, errors.New("invalid condition: no input")
+		}
+	}
+
+	return rule, nil
 }
 
 func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface{}, error) {
+	// if OUTPUT_MAP
+	// if OUTPUT_VALIDATION
+	// if OUTPUT
+
 	rulePasses, err := r.conditionChain.EvaluateConditions(input, r.conditions)
 	if err != nil {
 		return nil, err
@@ -53,27 +89,6 @@ func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface
 		return r.Output, nil
 	}
 	return nil, nil
-}
-
-// ConditionChain - AND, OR, XAND, NOR, etc
-type ConditionChain interface { // may have condition chain type - as interface
-	EvaluateConditions(input map[string]interface{}, conditions []Condition) (bool, error)
-}
-
-func ConditionChainAnd(input map[string]interface{}, conditions []Condition) (bool, error) {
-	passedConditions := 0
-
-	for _, condition := range conditions {
-		passed, err := condition.Evaluate(input)
-		if err != nil {
-			return false, err
-		}
-		if passed {
-			passedConditions++
-		}
-	}
-
-	return passedConditions == len(conditions), nil
 }
 
 type Condition struct {
