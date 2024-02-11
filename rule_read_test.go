@@ -2,7 +2,7 @@ package rules
 
 import (
 	"github.com/JJBordy/rules/test"
-	"gopkg.in/yaml.v2"
+	"github.com/go-yaml/yaml"
 	"os"
 	"testing"
 )
@@ -44,7 +44,26 @@ func TestRuleReading(t *testing.T) {
 	test.AssertEqual(exampleRule2.OutputMap, map[string]string{"file.color": "$car.windshield.size"}, t)
 }
 
-func TestExtractList(t *testing.T) {
+func TestExtractFieldVal(t *testing.T) {
+	input := map[string]interface{}{
+		"car": map[string]interface{}{
+			"trunk": map[string]interface{}{
+				"color":  "red",
+				"design": "42X",
+			},
+			"roof": map[string]interface{}{
+				"resistance": 31,
+				"insured":    true,
+			},
+		},
+	}
+
+	test.AssertEqual(extractFieldVal("car.trunk.color", input), "red", t)
+	test.AssertEqual(extractFieldVal("car.roof.resistance", input), 31, t)
+	test.AssertEqual(extractFieldVal("car.roof.insured", input), true, t)
+}
+
+func TestExtractFromSlice(t *testing.T) {
 	input := map[string]interface{}{
 		"customer": map[string]interface{}{
 			"familyMembers": []map[string]interface{}{
@@ -77,100 +96,7 @@ func TestExtractList(t *testing.T) {
 		},
 	}
 
-	path := "customer.familyMembers.permit.pets.name"
-	result := extractAsList(path, input)
+	path := "customer.familyMembers[*].permit.pets[*].name"
+	result := extractFromSlice(path, input)
 	test.AssertEqual(result, []any{"Max", "George", "Dory"}, t)
 }
-
-//func TestAppend(t *testing.T) {
-//	yamA := `
-//some:
-//  stuff: true
-//  things:
-//    look: nice
-//    are: [good]
-//`
-//
-//	yamB := `
-//some:
-//  otherStuff: false
-//  things:
-//    seem: cool
-//    are: [bad]
-//`
-//
-//	var result map[string]interface{}
-//
-//	err := yaml.Unmarshal([]byte(yamA), &result)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//	err = yaml.Unmarshal([]byte(yamB), &result)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	fmt.Printf("%+v\n", result)
-//}
-
-// TODO: it works, should be adjusted for actual rule model
-//func evaluate(data map[string]interface{}, rule RuleInput, output map[string]interface{}) (map[string]interface{}, error) {
-//
-//	var allTrue int
-//
-//	for _, andRule := range rule.Conditions {
-//		ruleElems := strings.Split(andRule., " ")
-//		input := ruleElems[0]
-//		comparison := ruleElems[1]
-//		value := ruleElems[2]
-//
-//		inputVal := extractFieldVal(input, data)
-//
-//		if strings.HasPrefix(value, "$") {
-//			value = extractFieldVal(strings.TrimPrefix(value, "$"), data)
-//		}
-//
-//		if comparison == ">" {
-//			v, err := strconv.ParseFloat(inputVal, 64)
-//			if err != nil {
-//				return nil, err
-//			}
-//			c, err := strconv.ParseFloat(value, 64)
-//			if err != nil {
-//				return nil, err
-//			}
-//			if v > c {
-//				allTrue++
-//			}
-//		} else if comparison == "==" {
-//			if inputVal == value {
-//				allTrue++
-//			}
-//		}
-//	}
-//
-//	if rule.ANDMin < allTrue {
-//		return nil, nil
-//	}
-//
-//	//finalOutput := make([][2]string, 0)
-//
-//	//for path, value := range rule.Output {
-//	//	finalOutput = append(finalOutput, [2]string{path, value})
-//	//}
-//
-//	return output, nil
-//}
-//
-//func extractFieldVal(path string, input map[string]interface{}) string {
-//	workMap := input
-//	for _, fieldName := range strings.Split(path, ".") {
-//		if val, ok := workMap[fieldName].(map[string]interface{}); ok {
-//			workMap = val
-//		} else {
-//			return fmt.Sprint(workMap[fieldName])
-//		}
-//	}
-//
-//	return ""
-//}
