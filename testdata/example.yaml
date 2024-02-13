@@ -5,7 +5,6 @@
   COND_CHAIN: AND
   COND:
     - inputs: customer.familyMembers[*].extendedInfo.pets[*].age
-      LIST_GT_ATLEAST: [ 3, 2 ]
       LIST_COUNT_GT: [ 4 ]
       LIST_CONTAINS_ALL: [ "powebank", "graphics card" ]
     - inputs: vipCustomers[*].cars[*].color.shades[*].accent
@@ -20,7 +19,7 @@
       EQUAL: [ "REGULAR" ]
     - input: customer.bank.card
       NONEMPTY: [ ]
-#    - RULE: some-rule-id # in a later version will support referencing rules & the resulting output
+    #    - RULE: some-rule-id # in a later version will support referencing rules & the resulting output
     - inputs: customer.familyMembers[*].age
       LIST_ALL_GT: [ 18 ]
     - input: customer.age

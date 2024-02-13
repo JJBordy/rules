@@ -19,9 +19,6 @@ type RuleInput struct {
 	OutputMap map[string]string      `yaml:"OUTPUT_MAP"`
 }
 
-type ConditionFunc func(input any, args []any) (bool, error)
-type ConditionFuncOfList func(inputs []any, args []any) (bool, error)
-
 type Rule struct {
 	Name     string
 	ID       string
@@ -56,16 +53,15 @@ func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface
 
 type Condition struct {
 	inputPath          string
-	args               []any
-	conditionFuncs     []ConditionFunc
-	conditionFuncsList []ConditionFuncOfList
+	conditionFuncs     []conditionFunction
+	conditionFuncsList []conditionFunctionOfList
 }
 
 func (c Condition) Evaluate(input map[string]interface{}) (bool, error) {
 	passedFunctions := 0
 
-	for _, conditionFunction := range c.conditionFuncs {
-		valid, err := conditionFunction(extractFieldVal(c.inputPath, input), c.args)
+	for _, conditionFunc := range c.conditionFuncs {
+		valid, err := conditionFunc.Function(extractFieldVal(c.inputPath, input))
 		if err != nil {
 			return false, err
 		}
@@ -74,8 +70,8 @@ func (c Condition) Evaluate(input map[string]interface{}) (bool, error) {
 		}
 	}
 
-	for _, conditionFunctionOfList := range c.conditionFuncsList {
-		valid, err := conditionFunctionOfList(extractFromSlice(c.inputPath, input), c.args)
+	for _, conditionFuncOfList := range c.conditionFuncsList {
+		valid, err := conditionFuncOfList.FunctionList(extractFromSlice(c.inputPath, input))
 		if err != nil {
 			return false, err
 		}
@@ -84,7 +80,7 @@ func (c Condition) Evaluate(input map[string]interface{}) (bool, error) {
 		}
 	}
 
-	return passedFunctions == len(c.conditionFuncs), nil
+	return passedFunctions == (len(c.conditionFuncs) + len(c.conditionFuncsList)), nil
 }
 
 // extracts the values from input which contains lists

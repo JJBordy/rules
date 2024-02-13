@@ -1,0 +1,17 @@
+- name: simple rule to test
+  COND_CHAIN: AND
+  COND:
+    - input: customer.usd
+      GREATER: [ 10 ]
+      LESS_THAN: [ 100 ]
+  OUTPUT:
+    bonus.points: 5
+- name: another simple rule with 'OR'
+  COND_CHAIN: OR
+  COND:
+    - input: customer.eur
+      GREATER: [ 50 ]
+    - input: customer.ron
+      LESS_THAN: [ 400 ]
+  OUTPUT:
+    bonus.name: super bonus

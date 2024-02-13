@@ -31,10 +31,10 @@ func (ConditionChainOr) EvaluateConditions(input map[string]interface{}, conditi
 		if err != nil {
 			return false, err
 		}
-		if !passed {
-			return false, nil
+		if passed {
+			return true, nil
 		}
 	}
 
-	return true, nil
+	return false, nil
 }

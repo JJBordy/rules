@@ -9,7 +9,7 @@ import (
 
 func TestRuleReading(t *testing.T) {
 
-	c, err := os.ReadFile("testdata/rule_read_test.yaml")
+	c, err := os.ReadFile("../testdata/rule_read_test.yaml")
 	if err != nil {
 		t.Fatal("could not read yaml file")
 	}

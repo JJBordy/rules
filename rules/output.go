@@ -18,14 +18,14 @@ func BuildOutput(outputResults []map[string]any) (output map[string]any, err err
 
 	for _, result := range outputResults {
 		for k, v := range result {
-			output = setValue(output, k, v)
+			output = setOutputValue(output, k, v)
 		}
 	}
 
 	return output, err
 }
 
-func setValue(m map[string]any, path string, val any) map[string]any {
+func setOutputValue(m map[string]any, path string, val any) map[string]any {
 	if m == nil {
 		m = make(map[string]any)
 	}
@@ -35,7 +35,7 @@ func setValue(m map[string]any, path string, val any) map[string]any {
 		if mapPart, ok := m[splitPath[0]].(map[string]any); ok {
 			mapToPass = mapPart
 		}
-		m[splitPath[0]] = setValue(mapToPass, strings.Join(splitPath[1:], "."), val)
+		m[splitPath[0]] = setOutputValue(mapToPass, strings.Join(splitPath[1:], "."), val)
 	} else {
 		switch reflect.ValueOf(val).Kind() {
 		case reflect.Slice:
