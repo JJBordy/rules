@@ -19,14 +19,13 @@
       EQUAL: [ "REGULAR" ]
     - input: customer.bank.card
       NONEMPTY: [ ]
-    #    - RULE: some-rule-id # in a later version will support referencing rules & the resulting output
     - inputs: customer.familyMembers[*].age
       LIST_ALL_GT: [ 18 ]
     - input: customer.age
       BETWEEN: [ 18, 100 ]
   OUTPUT:
     promote.status: vip
-    performance.indicators: [ "good boy", "super man" ] # specify to append or replace
+    performance.indicators: [ "good boy", "super man" ]
   OUTPUT_VALIDATION: validation.output.here
 - name: customer business card color
   MAP:
