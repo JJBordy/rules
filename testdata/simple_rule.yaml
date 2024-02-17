@@ -22,5 +22,8 @@
   MAP:
     Michael: Super Mike
     George: Super George
+    Vasile: Super Vasile
+    Ion: Super Ion
   OUTPUT_MAP:
-    bonus.supername: customer.name
+    bonus.superName: customer.name
+    bonus.friends: customer.friends[*]

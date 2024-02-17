@@ -30,7 +30,7 @@ func NewEngine(cd EngineConstructorData) *Engine {
 		funcs[k] = v
 	}
 
-	listFuncs := functions.DefaultList()
+	listFuncs := functions.DefaultOfList()
 	for k, v := range cd.UserListFunctions {
 		listFuncs[k] = v
 	}

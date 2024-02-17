@@ -1,6 +1,9 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type Rule struct {
 	Name     string
@@ -35,15 +38,31 @@ func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface
 	}
 
 	for outPath, inPath := range r.OutputMap {
-		fieldValue := extractFieldVal(inPath, input)
-		if fieldValue == nil {
-			continue
+		if strings.Contains(inPath, "[*]") {
+			fieldListValues := extractFromSlice(inPath, input)
+			if fieldListValues == nil {
+				continue
+			}
+			resultList := make([]interface{}, 0)
+			for _, mapKey := range fieldListValues {
+				if r.Map[fmt.Sprint(mapKey)] == nil {
+					continue
+				}
+				resultList = append(resultList, r.Map[fmt.Sprint(mapKey)])
+			}
+			out[outPath] = resultList
+
+		} else {
+			fieldValue := extractFieldVal(inPath, input)
+			if fieldValue == nil {
+				continue
+			}
+			mapKey := fmt.Sprint(fieldValue)
+			if r.Map[mapKey] == nil {
+				continue
+			}
+			out[outPath] = r.Map[mapKey]
 		}
-		mapKey := fmt.Sprint(fieldValue)
-		if r.Map[mapKey] == nil {
-			continue
-		}
-		out[outPath] = r.Map[mapKey]
 	}
 
 	return out, nil

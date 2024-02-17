@@ -1,6 +1,9 @@
 package core
 
-import "strings"
+import (
+	"reflect"
+	"strings"
+)
 
 // extracts the values from input which contains lists
 // car.windows[*].safety.ratings[*].certification will return certifications of all ratings of all windows of the car
@@ -17,9 +20,14 @@ func extractFromSlice(path string, input map[string]interface{}) []any {
 
 			slicePath = strings.TrimSuffix(pathElem, "[*]")
 
-			if arr, ok := workMap[slicePath].([]map[string]interface{}); ok {
-				for _, arrElem := range arr {
+			if arrMap, ok := workMap[slicePath].([]map[string]interface{}); ok {
+				for _, arrElem := range arrMap {
 					resultSlice = append(resultSlice, extractFromSlice(strings.Join(pathElems[pi+1:], "."), arrElem)...)
+				}
+			} else if reflect.ValueOf(workMap[slicePath]).Kind() == reflect.Slice {
+				sliceVal := reflect.ValueOf(workMap[slicePath])
+				for i := 0; i < sliceVal.Len(); i++ {
+					resultSlice = append(resultSlice, sliceVal.Index(i).Interface())
 				}
 			}
 
@@ -48,4 +56,8 @@ func extractFieldVal(path string, input map[string]interface{}) any {
 	}
 
 	return nil
+}
+
+func extractFieldList(path string, input map[string]interface{}) []any {
+	return extractFromSlice(path, input)
 }

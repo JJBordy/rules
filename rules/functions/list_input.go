@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func DefaultList() map[string]FunctionOfList {
+func DefaultOfList() map[string]FunctionOfList {
 	return make(map[string]FunctionOfList)
 }
 
