@@ -9,6 +9,12 @@ output will be different.
 
 The goal is to have well-defined and well explained schema for the conditions.
 
+# TODO:
+* add all the built in functions necessary
+* add tests for all .go files
+* create multiple good and meaningful examples
+* publish
+
 In the future should provide:
 * able to tell which rules failed and why, which rules succeeded and why.
 * output functions
