@@ -24,9 +24,11 @@ func TestEngine(t *testing.T) {
 
 	carRentalInput := map[string]interface{}{
 		"customer": map[string]interface{}{
-			"usd": 50,
-			"eur": 51,
-			"ron": 1000,
+			"usd":  50,
+			"eur":  51,
+			"ron":  1000,
+			"age":  70,
+			"name": "George",
 		},
 	}
 
@@ -37,8 +39,9 @@ func TestEngine(t *testing.T) {
 
 	expectedOutput := map[string]interface{}{
 		"bonus": map[string]interface{}{
-			"points": 5,
-			"name":   "super bonus",
+			"points":    5,
+			"name":      "super bonus",
+			"supername": "Super George",
 		},
 	}
 

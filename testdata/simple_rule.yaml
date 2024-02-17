@@ -15,3 +15,12 @@
       LESS_THAN: [ 400 ]
   OUTPUT:
     bonus.name: super bonus
+- name: test how the map works
+  COND:
+    - input: customer.age
+      GREATER: [ 18 ]
+  MAP:
+    Michael: Super Mike
+    George: Super George
+  OUTPUT_MAP:
+    bonus.supername: customer.name

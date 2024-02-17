@@ -1,5 +1,7 @@
 package core
 
+import "fmt"
+
 type Rule struct {
 	Name     string
 	ID       string
@@ -16,10 +18,6 @@ type Rule struct {
 }
 
 func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface{}, error) {
-
-	// if OUTPUT_MAP
-	// if OUTPUT
-
 	out := make(map[string]interface{})
 
 	rulePasses, err := r.ConditionChain.EvaluateConditions(input, r.Conditions)
@@ -27,7 +25,25 @@ func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface
 		return nil, err
 	}
 	if rulePasses {
-		out = r.Output
+		if r.Output != nil {
+			out = r.Output
+		}
+	}
+
+	if r.OutputMap == nil || r.Map == nil {
+		return out, nil
+	}
+
+	for outPath, inPath := range r.OutputMap {
+		fieldValue := extractFieldVal(inPath, input)
+		if fieldValue == nil {
+			continue
+		}
+		mapKey := fmt.Sprint(fieldValue)
+		if r.Map[mapKey] == nil {
+			continue
+		}
+		out[outPath] = r.Map[mapKey]
 	}
 
 	return out, nil

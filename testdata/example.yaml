@@ -33,5 +33,5 @@
     6: green
     8: aqua
   OUTPUT_MAP:
-    file.color: $car.windshield.size
-    design.roof.shadow: $car.wheels.shadow
+    file.color: car.windshield.size
+    design.roof.shadow: car.wheels.shadow
