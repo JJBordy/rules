@@ -11,25 +11,26 @@ type Rule struct {
 
 	Map map[string]interface{}
 
-	Output           map[string]interface{}
-	OutputMap        map[string]string
-	OutputValidation string
+	Output    map[string]interface{}
+	OutputMap map[string]string
 }
 
 func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface{}, error) {
 
 	// if OUTPUT_MAP
-	// if OUTPUT_VALIDATION
 	// if OUTPUT
+
+	out := make(map[string]interface{})
 
 	rulePasses, err := r.ConditionChain.EvaluateConditions(input, r.Conditions)
 	if err != nil {
 		return nil, err
 	}
 	if rulePasses {
-		return r.Output, nil
+		out = r.Output
 	}
-	return nil, nil
+
+	return out, nil
 }
 
 func (r Rule) DebugOutput(input map[string]interface{}) ([]DebugConditions, map[string]interface{}, error) {

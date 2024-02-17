@@ -10,7 +10,5 @@ output will be different.
 The goal is to have well-defined and well explained schema for the conditions.
 
 In the future should provide:
-* validation of rules with detailed explanation of why it failed.
-* validation of input provided in case it is not compliant with a rule.
 * able to tell which rules failed and why, which rules succeeded and why.
 * output functions

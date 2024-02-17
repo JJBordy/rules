@@ -26,7 +26,6 @@ func TestRuleReading(t *testing.T) {
 	test.AssertEqual(exampleRule1.ID, "rule-id", t)
 	test.AssertEqual(exampleRule1.Priority, 10, t)
 	test.AssertEqual(exampleRule1.ConditionsChain, "AND", t)
-	test.AssertEqual(exampleRule1.OutputValidation, "validation.output.here", t)
 
 	conditions1 := exampleRule1.Conditions[0]
 	test.AssertEqual(conditions1["input"], "customer.balance.usd", t)

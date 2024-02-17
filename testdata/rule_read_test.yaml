@@ -11,7 +11,6 @@
       EQUAL_ANY: [ "Ion", "Vasile", "George" ]
     - inputs: customer.accoutns[*].balance
       LIST_SUM_GT: [ 100 ]
-  OUTPUT_VALIDATION: validation.output.here
 - name: customer business card color
   MAP:
     3: blue

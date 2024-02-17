@@ -8,8 +8,7 @@ type RuleInput struct {
 	ConditionsChain string                   `yaml:"COND_CHAIN"`
 	Conditions      []map[string]interface{} `yaml:"COND"`
 
-	Output           map[string]interface{} `yaml:"OUTPUT"`
-	OutputValidation string                 `yaml:"OUTPUT_VALIDATION"`
+	Output map[string]interface{} `yaml:"OUTPUT"`
 
 	Map       map[string]interface{} `yaml:"MAP"`
 	OutputMap map[string]string      `yaml:"OUTPUT_MAP"`

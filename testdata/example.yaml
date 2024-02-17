@@ -26,7 +26,6 @@
   OUTPUT:
     promote.status: vip
     performance.indicators: [ "good boy", "super man" ]
-  OUTPUT_VALIDATION: validation.output.here
 - name: customer business card color
   MAP:
     3: blue
@@ -34,8 +33,5 @@
     6: green
     8: aqua
   OUTPUT_MAP:
-    # maybe use just one output; with optional parameter: validation, map, etc
-    # also: lists append / lists replace
-    # in future releases, specify the output with @promote.status.vip then it will make a tree...
     file.color: $car.windshield.size
     design.roof.shadow: $car.wheels.shadow

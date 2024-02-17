@@ -106,13 +106,12 @@ func (e *Engine) CreateSet(setName string, ruleInputs []RuleInput) error {
 
 func (e *Engine) parseRuleInput(ruleInput RuleInput) (core.Rule, error) {
 	rule := core.Rule{
-		Name:             ruleInput.Name,
-		ID:               ruleInput.ID,
-		Map:              ruleInput.Map,
-		Output:           ruleInput.Output,
-		OutputMap:        ruleInput.OutputMap,
-		OutputValidation: ruleInput.OutputValidation,
-		Conditions:       make([]core.Condition, 0),
+		Name:       ruleInput.Name,
+		ID:         ruleInput.ID,
+		Map:        ruleInput.Map,
+		Output:     ruleInput.Output,
+		OutputMap:  ruleInput.OutputMap,
+		Conditions: make([]core.Condition, 0),
 	}
 
 	conditionsChain, err := core.NewConditionChain(ruleInput.ConditionsChain)
