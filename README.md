@@ -9,12 +9,21 @@ output will be different.
 
 The goal is to have well-defined and well explained schema for the conditions.
 
-# TODO:
-* add all the built in functions necessary
-* add tests for all .go files
-* create multiple good and meaningful examples
+### ROADMAP BEFORE 1.0:
+
+* modify the structure for CONDITIONS / CONDITIONS_LIST
+* Reference array elements
+* add all the built-in functions necessary
+* use testify for tests
+* add meaningful tests for all .go files
+* create good and meaningful examples
+* ask feedback before publishing
 * publish
 
-In the future should provide:
-* able to tell which rules failed and why, which rules succeeded and why.
-* output functions
+### POST 1.0 ROADMAP:
+
+* Rules will be able to have a priority (rules with higher priority will be executed latest and override any previous
+  output)
+* Rules will gain ID and conditions will be able to reference other rules
+* Maybe: full rules engine: will be able to reference the generated output in conditions
+* Maybe: output functions (random, time, capitalize string, etc)

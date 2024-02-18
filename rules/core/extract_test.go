@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/JJBordy/rules/test"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -19,9 +19,9 @@ func TestExtractFieldVal(t *testing.T) {
 		},
 	}
 
-	test.AssertEqual(extractFieldVal("car.trunk.color", input), "red", t)
-	test.AssertEqual(extractFieldVal("car.roof.resistance", input), 31, t)
-	test.AssertEqual(extractFieldVal("car.roof.insured", input), true, t)
+	assert.Equal(t, "red", extractFieldVal("car.trunk.color", input))
+	assert.Equal(t, 31, extractFieldVal("car.roof.resistance", input))
+	assert.Equal(t, true, extractFieldVal("car.roof.insured", input))
 }
 
 func TestExtractFromSlice(t *testing.T) {
@@ -59,5 +59,5 @@ func TestExtractFromSlice(t *testing.T) {
 
 	path := "customer.familyMembers[*].permit.pets[*].name"
 	result := extractFromSlice(path, input)
-	test.AssertEqual(result, []any{"Max", "George", "Dory"}, t)
+	assert.Equal(t, []any{"Max", "George", "Dory"}, result)
 }

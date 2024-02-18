@@ -2,8 +2,8 @@ package rules
 
 import (
 	"fmt"
-	"github.com/JJBordy/rules/test"
 	"github.com/go-yaml/yaml"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
@@ -13,15 +13,16 @@ func TestEngine(t *testing.T) {
 	engine := NewEngine(EngineConstructorData{})
 
 	fileContent, err := os.ReadFile("../testdata/simple_rule.yaml")
-	test.AsserErrtNil(err, t)
+	assert.Nil(t, err)
 
 	var carRentalRules []RuleInput
 	err = yaml.Unmarshal(fileContent, &carRentalRules)
-	test.AsserErrtNil(err, t)
+	assert.Nil(t, err)
 
 	err = engine.CreateSet("car rental", carRentalRules)
-	test.AsserErrtNil(err, t)
+	assert.Nil(t, err)
 
+	// example input
 	carRentalInput := map[string]interface{}{
 		"customer": map[string]interface{}{
 			"usd":     50,
@@ -35,17 +36,15 @@ func TestEngine(t *testing.T) {
 
 	outputOfSet, err := engine.EvaluateSet("car rental", carRentalInput)
 	fmt.Printf("setOutput: %+v\n", outputOfSet)
-
-	test.AsserErrtNil(err, t)
+	assert.Nil(t, err)
 
 	expectedOutput := map[string]interface{}{
 		"bonus": map[string]interface{}{
 			"points":    5,
 			"name":      "super bonus",
 			"superName": "Super George",
-			"friends":   []string{"Super Vasile", "Super Ion", "Super Mike"},
+			"friends":   []interface{}{"Super Vasile", "Super Ion", "Super Mike"},
 		},
 	}
-
-	test.AssertEqual(outputOfSet, expectedOutput, t)
+	assert.Equal(t, expectedOutput, outputOfSet)
 }

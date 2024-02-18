@@ -1,19 +1,23 @@
 - name: Rule Name
   id: rule-id
   priority: 10
-  COND_CHAIN: AND
-  COND:
+  chain: AND
+  conditions:
     - input: customer.balance.usd
-      GREATER: [ 10 ]
-      LESS_THAN: [ 100 ]
+      functions:
+        GREATER: [ 10 ]
+        LESS_THAN: [ 100 ]
     - input: customer.name
-      EQUAL: [ $customer.surname ]
-      EQUAL_ANY: [ "Ion", "Vasile", "George" ]
+      functions:
+        EQUAL: [ $customer.surname ]
+        EQUAL_ANY: [ "Ion", "Vasile", "George" ]
+  conditionsList:
     - inputs: customer.accoutns[*].balance
-      LIST_SUM_GT: [ 100 ]
+      functions:
+        LIST_SUM_GT: [ 100 ]
 - name: customer business card color
-  MAP:
+  map:
     3: blue
     5: red
-  OUTPUT_MAP:
+  outputMap:
     file.color: $car.windshield.size

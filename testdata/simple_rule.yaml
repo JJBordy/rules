@@ -1,29 +1,33 @@
 - name: simple rule to test
-  COND_CHAIN: AND
-  COND:
+  chain: AND
+  conditions:
     - input: customer.usd
-      GREATER: [ 10 ]
-      LOWER: [ 100 ]
-  OUTPUT:
+      functions:
+        GREATER: [ 10 ]
+        LOWER: [ 100 ]
+  output:
     bonus.points: 5
 - name: another simple rule with 'OR'
-  COND_CHAIN: OR
-  COND:
+  chain: OR
+  conditions:
     - input: customer.eur
-      GREATER: [ 50 ]
+      functions:
+        GREATER: [ 50 ]
     - input: customer.ron
-      LOWER: [ 400 ]
-  OUTPUT:
+      functions:
+        LOWER: [ 400 ]
+  output:
     bonus.name: super bonus
 - name: test how the map works
-  COND:
+  conditions:
     - input: customer.age
-      GREATER: [ 18 ]
-  MAP:
+      functions:
+        GREATER: [ 18 ]
+  map:
     Michael: Super Mike
     George: Super George
     Vasile: Super Vasile
     Ion: Super Ion
-  OUTPUT_MAP:
+  outputMap:
     bonus.superName: customer.name
     bonus.friends: customer.friends[*]

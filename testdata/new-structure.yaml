@@ -1,0 +1,16 @@
+- name: rule with new structure
+  chain: AND
+  conditions:
+    - input: patient.weightHeightAgeProportion
+      functions:
+        GREATER: [ 2 ]
+    - input: patient.smoking
+      functions:
+        EQUAL: [ true ]
+  conditionsList:
+    - inputs: patient.markers[*].riskAssesment
+      functions:
+        ALL_GREATER: [ 10 ]
+  output:
+    disease.risk.increment: [ 5 ]
+    food.daily.calories.decrease: [ 4 ]

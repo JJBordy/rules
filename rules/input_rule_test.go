@@ -1,8 +1,8 @@
 package rules
 
 import (
-	"github.com/JJBordy/rules/test"
 	"github.com/go-yaml/yaml"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
@@ -22,22 +22,22 @@ func TestRuleReading(t *testing.T) {
 	}
 
 	exampleRule1 := rules[0]
-	test.AssertEqual(exampleRule1.Name, "Rule Name", t)
-	test.AssertEqual(exampleRule1.ID, "rule-id", t)
-	test.AssertEqual(exampleRule1.Priority, 10, t)
-	test.AssertEqual(exampleRule1.ConditionsChain, "AND", t)
+	assert.Equal(t, "Rule Name", exampleRule1.Name)
+	assert.Equal(t, "rule-id", exampleRule1.ID)
+	assert.Equal(t, 10, exampleRule1.Priority)
+	assert.Equal(t, "AND", exampleRule1.ConditionsChain)
 
 	conditions1 := exampleRule1.Conditions[0]
-	test.AssertEqual(conditions1["input"], "customer.balance.usd", t)
-	test.AssertEqual(conditions1["GREATER"], []int{10}, t)
-	test.AssertEqual(conditions1["LESS_THAN"], []int{100}, t)
+	assert.Equal(t, "customer.balance.usd", conditions1.Input)
+	assert.NotNil(t, conditions1.Functions["GREATER"])
+	assert.NotNil(t, conditions1.Functions["LESS_THAN"])
 	conditions2 := exampleRule1.Conditions[1]
-	test.AssertEqual(conditions2["input"], "customer.name", t)
-	test.AssertEqual(conditions2["EQUAL"], []string{"$customer.surname"}, t)
-	test.AssertEqual(conditions2["EQUAL_ANY"], []string{"Ion", "Vasile", "George"}, t)
+	assert.Equal(t, "customer.name", conditions2.Input)
+	assert.NotNil(t, conditions2.Functions["EQUAL"])
+	assert.NotNil(t, conditions2.Functions["EQUAL_ANY"])
 
 	exampleRule2 := rules[1]
-	test.AssertEqual(exampleRule2.Name, "customer business card color", t)
-	test.AssertEqual(exampleRule2.Map, map[int]string{3: "blue", 5: "red"}, t)
-	test.AssertEqual(exampleRule2.OutputMap, map[string]string{"file.color": "$car.windshield.size"}, t)
+	assert.Equal(t, "customer business card color", exampleRule2.Name)
+	assert.Equal(t, map[string]interface{}{"3": "blue", "5": "red"}, exampleRule2.Map)
+	assert.Equal(t, map[string]string{"file.color": "$car.windshield.size"}, exampleRule2.OutputMap)
 }

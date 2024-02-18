@@ -120,16 +120,10 @@ func (e *Engine) parseRuleInput(ruleInput RuleInput) (core.Rule, error) {
 	}
 	rule.ConditionChain = conditionsChain
 
-	for _, conditionInput := range ruleInput.Conditions {
+	for _, condition := range ruleInput.Conditions {
+		newCondition := core.NewCondition(fmt.Sprint(condition.Input), e.conditionFunctions, e.conditionListFunctions)
 
-		inputPath, err := extractConditionInput(conditionInput)
-		if err != nil {
-			return rule, err
-		}
-
-		newCondition := core.NewCondition(fmt.Sprint(inputPath), e.conditionFunctions, e.conditionListFunctions)
-
-		for function, args := range conditionInput {
+		for function, args := range condition.Functions {
 			err = newCondition.AddFunction(function, args)
 			if err != nil {
 				return rule, err
@@ -137,6 +131,17 @@ func (e *Engine) parseRuleInput(ruleInput RuleInput) (core.Rule, error) {
 		}
 
 		rule.Conditions = append(rule.Conditions, *newCondition)
+	}
+
+	for _, conditionList := range ruleInput.ConditionsList {
+		newConditionList := core.NewCondition(fmt.Sprint(conditionList.Inputs), e.conditionFunctions, e.conditionListFunctions)
+
+		for function, args := range conditionList.Functions {
+			err = newConditionList.AddFunction(function, args)
+			if err != nil {
+				return rule, err
+			}
+		}
 	}
 
 	return rule, nil
