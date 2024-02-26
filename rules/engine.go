@@ -13,6 +13,9 @@ type Engine struct {
 	ruleSets               map[string][]core.Rule
 	conditionFunctions     map[string]functions.Function
 	conditionListFunctions map[string]functions.FunctionOfList
+
+	aggregationFunctions     functions.AggregateFunctions
+	listFunctionsConstraints map[string]functions.ListFunctionConstraint
 }
 
 type EngineConstructorData struct {
@@ -37,6 +40,8 @@ func NewEngine(cd EngineConstructorData) *Engine {
 
 	e.conditionFunctions = funcs
 	e.conditionListFunctions = listFuncs
+
+	e.aggregationFunctions = functions.AllAggregateFunctions()
 
 	return &e
 }

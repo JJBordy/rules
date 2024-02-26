@@ -1,20 +1,27 @@
 - name: Rule Name
   id: rule-id
   priority: 10
-  chain: AND
+  chain: AND # AND, OR, NAND, NOR, XOR, XNOR
   conditions:
     - input: customer.balance.usd
       functions:
-        GREATER: [ 10 ]
-        LESS_THAN: [ 100 ]
+        Greater: [ 10 ]
+        Lower: [ 100 ]
     - input: customer.name
       functions:
-        EQUAL: [ $customer.surname ]
-        EQUAL_ANY: [ "Ion", "Vasile", "George" ]
+        Equal: [ $customer.surname ]
+        EqualAny: [ "Ion", "Vasile", "George" ]
   conditionsList:
-    - inputs: customer.accoutns[*].balance
-      functions:
-        LIST_SUM_GT: [ 100 ]
+    - inputs: some.list.is.here[*].name
+      aggregate:
+        type: MIN # MIN, MAX, AVG, SUM, COUNT
+        functions:
+          Greater: [ 100 ]
+      listFunctions:
+        constraints:
+          AtLeast: [ 3 ]
+        functions:
+          Between: [ 10, 100 ]
 - name: customer business card color
   map:
     3: blue

@@ -36,6 +36,14 @@ func TestRuleReading(t *testing.T) {
 	assert.NotNil(t, conditions2.Functions["EQUAL"])
 	assert.NotNil(t, conditions2.Functions["EQUAL_ANY"])
 
+	// conditions list
+	conditionsList1 := exampleRule1.ConditionsList[0]
+	assert.Equal(t, "some.list.is.here[*].name", conditionsList1.Inputs)
+	assert.Equal(t, "MIN", conditionsList1.Aggregate.Type)
+	assert.Equal(t, []any{100}, conditionsList1.Aggregate.Functions["Greater"])
+	assert.Equal(t, []any{3}, conditionsList1.ListFunctions.Constraints["AtLeast"])
+	assert.Equal(t, []any{10, 100}, conditionsList1.ListFunctions.Functions["Between"])
+
 	exampleRule2 := rules[1]
 	assert.Equal(t, "customer business card color", exampleRule2.Name)
 	assert.Equal(t, map[string]interface{}{"3": "blue", "5": "red"}, exampleRule2.Map)

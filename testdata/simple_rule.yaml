@@ -3,8 +3,8 @@
   conditions:
     - input: customer.usd
       functions:
-        GREATER: [ 10 ]
-        LOWER: [ 100 ]
+        Greater: [ 10 ]
+        Lower: [ 100 ]
   output:
     bonus.points: 5
 - name: another simple rule with 'OR'
@@ -12,17 +12,17 @@
   conditions:
     - input: customer.eur
       functions:
-        GREATER: [ 50 ]
+        Greater: [ 50 ]
     - input: customer.ron
       functions:
-        LOWER: [ 400 ]
+        Lower: [ 400 ]
   output:
     bonus.name: super bonus
 - name: test how the map works
   conditions:
     - input: customer.age
       functions:
-        GREATER: [ 18 ]
+        Greater: [ 18 ]
   map:
     Michael: Super Mike
     George: Super George

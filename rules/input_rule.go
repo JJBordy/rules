@@ -21,6 +21,17 @@ type Conditions struct {
 }
 
 type ConditionsList struct {
-	Inputs    string           `yaml:"inputs"`
+	Inputs        string                  `yaml:"inputs"`
+	Aggregate     ConditionsListAggregate `yaml:"aggregate"`
+	ListFunctions ConditionsListFunctions `yaml:"listFunctions"`
+}
+
+type ConditionsListAggregate struct {
+	Type      string           `yaml:"type"`
 	Functions map[string][]any `yaml:"functions"`
+}
+
+type ConditionsListFunctions struct {
+	Constraints map[string][]any `yaml:"constraints"`
+	Functions   map[string][]any `yaml:"functions"`
 }

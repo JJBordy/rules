@@ -7,6 +7,57 @@ import (
 	"strings"
 )
 
+const (
+	// General functions
+
+	// Empty - the input is empty
+	Empty = "Empty"
+	// NonEmpty - the input is not empty
+	NonEmpty = "NonEmpty"
+	// Equal - the input is equal to the argument
+	Equal = "Equal"
+
+	// Numeric functions
+
+	// Greater - the input is a number and is greater than the argument
+	Greater = "Greater"
+	// GreaterEq - the input is a number and is greater or equal to the argument
+	GreaterEq = "GreaterEq"
+	// Lower - the input is a number and is lower than the argument
+	Lower = "Lower"
+	// LowerEq - the input is a number and is lower or equal to the argument
+	LowerEq = "LowerEq"
+	// Between - the input is a number and is between the two arguments
+	Between = "Between"
+	// BetweenEq - the input is a number and is between or equal to the two arguments
+	BetweenEq = "BetweenEq"
+	// NotBetween - the input is a number and is not between the two arguments
+	NotBetween = "NotBetween"
+	// NotBetweenEq - the input is a number and is not between or equal to the two arguments
+	NotBetweenEq = "NotBetweenEq"
+
+	// String functions
+
+	// EqualIgnoreCase - the input is equal to the argument; case-insensitive
+	EqualIgnoreCase = "EqualIgnoreCase"
+	// EqualAny - the input is equal to any of the arguments
+	EqualAny = "EqualAny"
+	// NotEqualAny - the input is not equal to any of the arguments
+	NotEqualAny = "NotEqualAny"
+	// StartsWith - the input starts with the argument
+	StartsWith = "StartsWith"
+	// StartsWithIgnoreCase - the input starts with the argument; case-insensitive
+	StartsWithIgnoreCase = "StartsWithIgnoreCase"
+	// EndsWith - the input ends with the argument
+	EndsWith = "EndsWith"
+	// EndsWithIgnoreCase - the input ends with the argument; case-insensitive
+	EndsWithIgnoreCase = "EndsWithIgnoreCase"
+	// Contains - the input contains the argument
+	Contains = "Contains"
+	// ContainsIgnoreCase - the input contains the argument; case-insensitive
+	ContainsIgnoreCase = "ContainsIgnoreCase"
+)
+
 func Default() map[string]Function {
 	m := make(map[string]Function)
 
@@ -18,17 +69,17 @@ func Default() map[string]Function {
 }
 
 func defaultGeneralFunctions(m map[string]Function) map[string]Function {
-	m["EMPTY"] = func(input any, args []any) (bool, error) {
+	m[Empty] = func(input any, args []any) (bool, error) {
 		return len(fmt.Sprint(input)) == 0, nil
 	}
 
-	m["NONEMPTY"] = func(input any, args []any) (bool, error) {
+	m[NonEmpty] = func(input any, args []any) (bool, error) {
 		return len(fmt.Sprint(input)) > 0, nil
 	}
 
-	m["EQUAL"] = func(input any, args []any) (bool, error) {
+	m[Equal] = func(input any, args []any) (bool, error) {
 		if len(args) != 1 {
-			return false, errors.New("EQUAL: needs one argument")
+			return false, errors.New(fmt.Sprintf("%s: needs one argument", Equal))
 		}
 		return fmt.Sprint(input) == fmt.Sprint(args[0]), nil
 	}
@@ -37,8 +88,8 @@ func defaultGeneralFunctions(m map[string]Function) map[string]Function {
 }
 
 func defaultNumericFUnctions(m map[string]Function) map[string]Function {
-	m["GREATER"] = func(input any, args []any) (bool, error) {
-		inputNr, argsNr, err := ParseNumeric("GREATER", input, args, 1)
+	m[Greater] = func(input any, args []any) (bool, error) {
+		inputNr, argsNr, err := ParseNumeric(Greater, input, args, 1)
 		if err != nil {
 			return false, err
 		}
@@ -46,16 +97,16 @@ func defaultNumericFUnctions(m map[string]Function) map[string]Function {
 		return inputNr > argsNr[0], nil
 	}
 
-	m["GREATER_EQ"] = func(input any, args []any) (bool, error) {
-		inputNr, argsNr, err := ParseNumeric("GREATER_EQ", input, args, 1)
+	m[GreaterEq] = func(input any, args []any) (bool, error) {
+		inputNr, argsNr, err := ParseNumeric(GreaterEq, input, args, 1)
 		if err != nil {
 			return false, err
 		}
 		return inputNr >= argsNr[0], nil
 	}
 
-	m["LOWER"] = func(input any, args []any) (bool, error) {
-		inputNr, argsNr, err := ParseNumeric("LOWER", input, args, 1)
+	m[Lower] = func(input any, args []any) (bool, error) {
+		inputNr, argsNr, err := ParseNumeric(Lower, input, args, 1)
 		if err != nil {
 			return false, err
 		}
@@ -63,40 +114,40 @@ func defaultNumericFUnctions(m map[string]Function) map[string]Function {
 		return inputNr < argsNr[0], nil
 	}
 
-	m["LOWER_EQ"] = func(input any, args []any) (bool, error) {
-		inputNr, argsNr, err := ParseNumeric("LOWER_EQ", input, args, 1)
+	m[LowerEq] = func(input any, args []any) (bool, error) {
+		inputNr, argsNr, err := ParseNumeric(LowerEq, input, args, 1)
 		if err != nil {
 			return false, err
 		}
 		return inputNr <= argsNr[0], nil
 	}
 
-	m["BETWEEN"] = func(input any, args []any) (bool, error) {
-		inputNr, argsNr, err := ParseNumeric("BETWEEN", input, args, 2)
+	m[Between] = func(input any, args []any) (bool, error) {
+		inputNr, argsNr, err := ParseNumeric(Between, input, args, 2)
 		if err != nil {
 			return false, err
 		}
 		return inputNr > argsNr[0] && inputNr < argsNr[1], nil
 	}
 
-	m["BETWEEN_EQ"] = func(input any, args []any) (bool, error) {
-		inputNr, argsNr, err := ParseNumeric("BETWEEN_EQ", input, args, 2)
+	m[BetweenEq] = func(input any, args []any) (bool, error) {
+		inputNr, argsNr, err := ParseNumeric(BetweenEq, input, args, 2)
 		if err != nil {
 			return false, err
 		}
 		return inputNr >= argsNr[0] && inputNr <= argsNr[1], nil
 	}
 
-	m["NOT_BETWEEN"] = func(input any, args []any) (bool, error) {
-		inputNr, argsNr, err := ParseNumeric("NOT_BETWEEN", input, args, 2)
+	m[NotBetween] = func(input any, args []any) (bool, error) {
+		inputNr, argsNr, err := ParseNumeric(NotBetween, input, args, 2)
 		if err != nil {
 			return false, err
 		}
 		return inputNr <= argsNr[0] || inputNr >= argsNr[1], nil
 	}
 
-	m["NOT_BETWEEN_EQ"] = func(input any, args []any) (bool, error) {
-		inputNr, argsNr, err := ParseNumeric("NOT_BETWEEN_EQ", input, args, 2)
+	m[NotBetweenEq] = func(input any, args []any) (bool, error) {
+		inputNr, argsNr, err := ParseNumeric(NotBetweenEq, input, args, 2)
 		if err != nil {
 			return false, err
 		}
@@ -107,14 +158,14 @@ func defaultNumericFUnctions(m map[string]Function) map[string]Function {
 }
 
 func defaultStringFunctions(m map[string]Function) map[string]Function {
-	m["EQUAL_IGNORE_CASE"] = func(input any, args []any) (bool, error) {
+	m[EqualIgnoreCase] = func(input any, args []any) (bool, error) {
 		if len(args) != 1 {
-			return false, errors.New("EQUAL_IGNORE_CASE: needs one argument")
+			return false, errors.New(fmt.Sprintf("%s: needs one argument", EqualIgnoreCase))
 		}
 		return strings.ToLower(fmt.Sprint(input)) == strings.ToLower(fmt.Sprint(args[0])), nil
 	}
 
-	m["EQUAL_ANY"] = func(input any, args []any) (bool, error) {
+	m[EqualAny] = func(input any, args []any) (bool, error) {
 		for _, arg := range args {
 			if fmt.Sprint(input) == fmt.Sprint(arg) {
 				return true, nil
@@ -123,7 +174,7 @@ func defaultStringFunctions(m map[string]Function) map[string]Function {
 		return false, nil
 	}
 
-	m["NOT_EQUAL_ANY"] = func(input any, args []any) (bool, error) {
+	m[NotEqualAny] = func(input any, args []any) (bool, error) {
 		for _, arg := range args {
 			if fmt.Sprint(input) == fmt.Sprint(arg) {
 				return false, nil
@@ -132,44 +183,44 @@ func defaultStringFunctions(m map[string]Function) map[string]Function {
 		return true, nil
 	}
 
-	m["STARTS_WITH"] = func(input any, args []any) (bool, error) {
+	m[StartsWith] = func(input any, args []any) (bool, error) {
 		if len(args) != 1 {
-			return false, errors.New("STARTS_WITH: needs one argument")
+			return false, errors.New(fmt.Sprintf("%s: needs one argument", StartsWith))
 		}
 		return strings.HasPrefix(fmt.Sprint(input), fmt.Sprint(args[0])), nil
 	}
 
-	m["STARTS_WITH_IGNORE_CASE"] = func(input any, args []any) (bool, error) {
+	m[StartsWithIgnoreCase] = func(input any, args []any) (bool, error) {
 		if len(args) != 1 {
-			return false, errors.New("STARTS_WITH_IGNORE_CASE: needs one argument")
+			return false, errors.New(fmt.Sprintf("%s: needs one argument", StartsWithIgnoreCase))
 		}
 		return strings.HasPrefix(strings.ToLower(fmt.Sprint(input)), strings.ToLower(fmt.Sprint(args[0]))), nil
 	}
 
-	m["ENDS_WITH"] = func(input any, args []any) (bool, error) {
+	m[EndsWith] = func(input any, args []any) (bool, error) {
 		if len(args) != 1 {
-			return false, errors.New("ENDS_WITH: needs one argument")
+			return false, errors.New(fmt.Sprintf("%s: needs one argument", EndsWith))
 		}
 		return strings.HasSuffix(fmt.Sprint(input), fmt.Sprint(args[0])), nil
 	}
 
-	m["ENDS_WITH_IGNORE_CASE"] = func(input any, args []any) (bool, error) {
+	m[EndsWithIgnoreCase] = func(input any, args []any) (bool, error) {
 		if len(args) != 1 {
-			return false, errors.New("ENDS_WITH_IGNORE_CASE: needs one argument")
+			return false, errors.New(fmt.Sprintf("%s: needs one argument", EndsWithIgnoreCase))
 		}
 		return strings.HasSuffix(strings.ToLower(fmt.Sprint(input)), strings.ToLower(fmt.Sprint(args[0]))), nil
 	}
 
-	m["CONTAINS"] = func(input any, args []any) (bool, error) {
+	m[Contains] = func(input any, args []any) (bool, error) {
 		if len(args) != 1 {
-			return false, errors.New("CONTAINS: needs one argument")
+			return false, errors.New(fmt.Sprintf("%s: needs one argument", Contains))
 		}
 		return strings.Contains(fmt.Sprint(input), fmt.Sprint(args[0])), nil
 	}
 
-	m["CONTAINS_IGNORE_CASE"] = func(input any, args []any) (bool, error) {
+	m[ContainsIgnoreCase] = func(input any, args []any) (bool, error) {
 		if len(args) != 1 {
-			return false, errors.New("CONTAINS_IGNORE_CASE: needs one argument")
+			return false, errors.New(fmt.Sprintf("%s: needs one argument", ContainsIgnoreCase))
 		}
 		return strings.Contains(strings.ToLower(fmt.Sprint(input)), strings.ToLower(fmt.Sprint(args[0]))), nil
 	}

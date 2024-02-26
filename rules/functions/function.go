@@ -7,3 +7,13 @@ type Function func(input any, args []any) (bool, error)
 // FunctionOfList - definition of a function, which takes a list of elements as input
 // The concrete elements of this type have the exact implementation of the function
 type FunctionOfList func(inputs []any, args []any) (bool, error)
+
+type AggregatorFunctionOfList struct {
+	Aggregate AggregateFunction
+	Functions map[string]Function
+}
+
+type ConstrainedFunctionOfList struct {
+	Constraints map[string][]any
+	Functions   map[string]FunctionOfList
+}

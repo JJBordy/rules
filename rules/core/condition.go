@@ -12,11 +12,25 @@ import (
 type Condition struct {
 	InputPath string
 
-	EngineFunctions           map[string]functions.Function
-	EngineFunctionsOfList     map[string]functions.FunctionOfList
-	ConditionFunctions        map[string][]any // function name & arguments
+	// functions defined in the engine
+	EngineFunctions       map[string]functions.Function
+	EngineFunctionsOfList map[string]functions.FunctionOfList
+
+	// definitions of functions to apply for the condition to be valid
+	// single input
+	ConditionFunctions map[string][]any // function name & arguments
+	// list input
 	ConditionsFunctionsOfList map[string][]any // function of list name & arguments
+	ListFunctionsConstraints  map[string][]any
+	ListAggregateType         string
+	ListAggregateFunctions    map[string][]any
+
+	// aggregate type and list constraints are predefined for now
 }
+
+// add aggregate with functions
+
+// add list function (with constraints)
 
 func NewCondition(inputPath string, engineFunctions map[string]functions.Function, engineFunctionsOfList map[string]functions.FunctionOfList) *Condition {
 	return &Condition{
