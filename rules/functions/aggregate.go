@@ -7,20 +7,38 @@ import (
 	"strconv"
 )
 
+const (
+	// MIN - minimum value in list
+	MIN = "MIN"
+	// MAX - maximum value in list
+	MAX = "MAX"
+	// SUM - sum of values in list
+	SUM = "SUM"
+	// AVG - average of values in list
+	AVG = "AVG"
+	// COUNT - count of values in list
+	COUNT = "COUNT"
+)
+
 type AggregateFunction func(inputs []any) (float64, error)
 
 type AggregateFunctions struct {
 	aggregateFunctions map[string]AggregateFunction
 }
 
+func (af AggregateFunctions) GetFunction(functionName string) (AggregateFunction, bool) {
+	f, ok := af.aggregateFunctions[functionName]
+	return f, ok
+}
+
 func AllAggregateFunctions() AggregateFunctions {
 	return AggregateFunctions{
 		aggregateFunctions: map[string]AggregateFunction{
-			"MIN":   aggregateMIN(),
-			"MAX":   aggregateMAX(),
-			"SUM":   aggregateSUM(),
-			"AVG":   aggregateAVG(),
-			"COUNT": aggregateCOUNT(),
+			MIN:   aggregateMIN(),
+			MAX:   aggregateMAX(),
+			SUM:   aggregateSUM(),
+			AVG:   aggregateAVG(),
+			COUNT: aggregateCOUNT(),
 		},
 	}
 }

@@ -1,7 +1,7 @@
 - name: Rule Name
   id: rule-id
   priority: 10
-  chain: AND # AND, OR, NAND, NOR, XOR, XNOR
+  chain: AND
   conditions:
     - input: customer.balance.usd
       functions:
@@ -14,7 +14,7 @@
   conditionsList:
     - inputs: some.list.is.here[*].name
       aggregate:
-        type: MIN # MIN, MAX, AVG, SUM, COUNT
+        type: MIN
         functions:
           Greater: [ 100 ]
       listFunctions:

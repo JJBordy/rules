@@ -6,13 +6,27 @@ import (
 )
 
 const (
-	ChainTypeAND = "AND"
-	ChainTypeOR  = "OR"
+	// AND - all conditions should be true for the rule to produce the output (default if none specified)
+	AND = "AND"
+	// OR - at least one condition should be true for the rule to pass
+	OR = "OR"
+	// NAND - if all conditions are true, the rule will not produce the output
+	NAND = "NAND"
+	// NOR - if at least one condition is true, the rule will not pass
+	NOR = "NOR"
+	// XOR - if exactly one condition is true, the rule will pass
+	XOR = "XOR"
+	// XNOR - if exactly one condition is true, the rule will not pass
+	XNOR = "XNOR"
 )
 
 var validChainTypes = map[string]bool{
-	ChainTypeAND: true,
-	ChainTypeOR:  true,
+	AND:  true,
+	OR:   true,
+	NAND: true,
+	NOR:  true,
+	XOR:  true,
+	XNOR: true,
 }
 
 type ConditionsChain struct {
@@ -45,13 +59,52 @@ func (cc *ConditionsChain) TurnDebugOFF() {
 
 func (cc *ConditionsChain) EvaluateConditions(input map[string]interface{}, conditions []Condition) (bool, error) {
 	switch cc.conditionsChainType {
-	case ChainTypeAND:
+	case AND:
 		return cc.evaluateAND(input, conditions)
-	case ChainTypeOR:
+	case OR:
 		return cc.evaluateOR(input, conditions)
+	case NAND:
+		return cc.evaluateNAND(input, conditions)
+	case NOR:
+		return cc.evaluateNOR(input, conditions)
+	case XOR:
+		return cc.evaluateXOR(input, conditions)
+	case XNOR:
+		return cc.evaluateXNOR(input, conditions)
 	default:
 		return cc.evaluateAND(input, conditions)
 	}
+}
+
+func (cc *ConditionsChain) evaluateXNOR(input map[string]interface{}, conditions []Condition) (bool, error) {
+	passed, err := cc.evaluateXOR(input, conditions)
+	return !passed, err
+}
+
+func (cc *ConditionsChain) evaluateXOR(input map[string]interface{}, conditions []Condition) (bool, error) {
+	passedConditions := 0
+
+	for _, condition := range conditions {
+		passed, err := cc.evaluateCondition(input, condition)
+		if err != nil {
+			return false, err
+		}
+		if passed {
+			passedConditions++
+		}
+	}
+
+	return passedConditions == 1, nil
+}
+
+func (cc *ConditionsChain) evaluateNOR(input map[string]interface{}, conditions []Condition) (bool, error) {
+	passed, err := cc.evaluateOR(input, conditions)
+	return !passed, err
+}
+
+func (cc *ConditionsChain) evaluateNAND(input map[string]interface{}, conditions []Condition) (bool, error) {
+	passed, err := cc.evaluateAND(input, conditions)
+	return !passed, err
 }
 
 func (cc *ConditionsChain) evaluateAND(input map[string]interface{}, conditions []Condition) (bool, error) {
@@ -96,7 +149,7 @@ func (cc *ConditionsChain) evaluateCondition(input map[string]interface{}, c Con
 		}
 	}()
 
-	return c.IsTrue(input)
+	return c.Evaluate(input)
 }
 
 type DebugConditions struct {

@@ -13,9 +13,10 @@ const (
 	Exactly = "Exactly"
 	// None - no elements in list should pass the functions
 	None = "None"
-	// AtLeastFraction - minimum fraction of elements in list to pass the functions (1,2) = 50%, (2,3)
+	// AtLeastFraction - minimum fraction of elements in list to pass the functions (1,2) = 50%, (3,4) - 75%
 	AtLeastFraction = "AtLeastFraction"
-	AtMostFraction  = "AtMostFraction"
+	// AtMostFraction - maximum fraction of elements in list to pass the functions (1,2) = 50%, (3,4) - 75%
+	AtMostFraction = "AtMostFraction"
 )
 
 type ListFunctionConstraint func(listTotal, passedTotal int, args []int) bool

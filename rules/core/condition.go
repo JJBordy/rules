@@ -7,38 +7,34 @@ import (
 )
 
 // Need to have condition constructor, with ConditionData inside; as a pointer, to add functions safely
-// Then a Condition struct, reference by value, with the IsTrue function only
+// Then a Condition struct, reference by value, with the Evaluate function only
 
 type Condition struct {
 	InputPath string
 
 	// functions defined in the engine
-	EngineFunctions       map[string]functions.Function
-	EngineFunctionsOfList map[string]functions.FunctionOfList
+	EngineFunctions map[string]functions.Function
 
 	// definitions of functions to apply for the condition to be valid
 	// single input
 	ConditionFunctions map[string][]any // function name & arguments
 	// list input
-	ConditionsFunctionsOfList map[string][]any // function of list name & arguments
-	ListFunctionsConstraints  map[string][]any
-	ListAggregateType         string
-	ListAggregateFunctions    map[string][]any
+	ConditionsFunctionsOfList     map[string][]any
+	EngineListFunctionConstraints map[string]functions.ListFunctionConstraint
 
-	// aggregate type and list constraints are predefined for now
+	ListFunctionConstraints map[string][]int // constraint name & arguments
+
+	ListAggregateType      functions.AggregateFunction
+	ListAggregateFunctions map[string][]any
 }
 
-// add aggregate with functions
-
-// add list function (with constraints)
-
-func NewCondition(inputPath string, engineFunctions map[string]functions.Function, engineFunctionsOfList map[string]functions.FunctionOfList) *Condition {
+func NewCondition(inputPath string, engineFunctions map[string]functions.Function, engineListFunctionConstraints map[string]functions.ListFunctionConstraint) *Condition {
 	return &Condition{
-		InputPath:                 inputPath,
-		EngineFunctions:           engineFunctions,
-		EngineFunctionsOfList:     engineFunctionsOfList,
-		ConditionFunctions:        make(map[string][]any),
-		ConditionsFunctionsOfList: make(map[string][]any),
+		InputPath:                     inputPath,
+		EngineFunctions:               engineFunctions,
+		ConditionFunctions:            make(map[string][]any),
+		ConditionsFunctionsOfList:     make(map[string][]any),
+		EngineListFunctionConstraints: engineListFunctionConstraints,
 	}
 }
 
@@ -46,8 +42,6 @@ func NewCondition(inputPath string, engineFunctions map[string]functions.Functio
 func (c *Condition) AddFunction(funcName string, funcArgs any) error {
 	if _, isDefined := c.EngineFunctions[funcName]; isDefined {
 		return c.addFunction(funcName, funcArgs)
-	} else if _, isDefinedInList := c.EngineFunctionsOfList[funcName]; isDefinedInList {
-		return c.addFunctionOfList(funcName, funcArgs)
 	} else {
 		return errors.New(fmt.Sprintf("function: [%s] is not defined in the engine", funcName))
 	}
@@ -68,29 +62,69 @@ func (c *Condition) addFunctionOfList(funcName string, funcArgs any) error {
 	return errors.New(fmt.Sprintf("function: [%s] arguments must be of type []any", funcName))
 }
 
-// IsTrue - evaluate the condition for the given input
-func (c *Condition) IsTrue(input map[string]interface{}) (bool, error) {
-	passedFunctions := 0
+// Evaluate - evaluate the condition for the given input
+func (c *Condition) Evaluate(input map[string]interface{}) (bool, error) {
 
-	for funcKey, funcArgs := range c.ConditionFunctions {
-		valid, err := c.EngineFunctions[funcKey](extractFieldVal(c.InputPath, input), funcArgs)
+	// single input evaluation
+	for funcName, funcArgs := range c.ConditionFunctions {
+		valid, err := c.EngineFunctions[funcName](extractFieldVal(c.InputPath, input), funcArgs)
 		if err != nil {
 			return false, err
 		}
-		if valid {
-			passedFunctions++
+		if !valid {
+			return false, nil
 		}
 	}
 
-	for funcKey, funcArgs := range c.ConditionsFunctionsOfList {
-		valid, err := c.EngineFunctionsOfList[funcKey](extractFromSlice(c.InputPath, input), funcArgs)
+	// list aggregate evaluation
+	if c.ListAggregateType != nil {
+		aggregationResult, err := c.ListAggregateType(extractFromSlice(c.InputPath, input))
 		if err != nil {
 			return false, err
 		}
-		if valid {
-			passedFunctions++
+		for funcName, funcArgs := range c.ListAggregateFunctions {
+			resultTrue, err := c.EngineFunctions[funcName](aggregationResult, funcArgs)
+			if err != nil {
+				return false, err
+			}
+			if !resultTrue {
+				return false, nil
+			}
 		}
 	}
 
-	return passedFunctions == (len(c.ConditionFunctions) + len(c.ConditionsFunctionsOfList)), nil
+	// functions for lists
+
+	listElements := extractFromSlice(c.InputPath, input)
+	listValidResults := 0
+
+	for _, listElem := range listElements {
+
+		elemPassedFunctions := 0
+
+		for funcName, funcArgs := range c.ConditionsFunctionsOfList {
+
+			passed, err := c.EngineFunctions[funcName](listElem, funcArgs)
+			if err != nil {
+				return false, err
+			}
+			if passed {
+				elemPassedFunctions++
+			}
+		}
+
+		if elemPassedFunctions == len(c.ConditionsFunctionsOfList) {
+			listValidResults++
+		}
+
+	}
+
+	for listFunctionConstraint, constraintArgs := range c.ListFunctionConstraints {
+		constraintResult := c.EngineListFunctionConstraints[listFunctionConstraint](len(listElements), listValidResults, constraintArgs)
+		if !constraintResult {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }

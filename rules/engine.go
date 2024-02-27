@@ -6,21 +6,23 @@ import (
 	"github.com/JJBordy/rules/rules/core"
 	"github.com/JJBordy/rules/rules/functions"
 	"github.com/JJBordy/rules/rules/output"
+	"strconv"
 )
 
 type Engine struct {
-	conditionChains        map[string]core.ConditionsChain
-	ruleSets               map[string][]core.Rule
-	conditionFunctions     map[string]functions.Function
-	conditionListFunctions map[string]functions.FunctionOfList
+	ruleSets map[string][]core.Rule
 
-	aggregationFunctions     functions.AggregateFunctions
-	listFunctionsConstraints map[string]functions.ListFunctionConstraint
+	conditionChains map[string]core.ConditionsChain
+
+	singleInputFunctions map[string]functions.Function
+
+	listAggregation functions.AggregateFunctions
+
+	listInputConstraints map[string]functions.ListFunctionConstraint
 }
 
 type EngineConstructorData struct {
-	UserFunctions     map[string]functions.Function
-	UserListFunctions map[string]functions.FunctionOfList
+	UserFunctions map[string]functions.Function
 }
 
 func NewEngine(cd EngineConstructorData) *Engine {
@@ -33,15 +35,10 @@ func NewEngine(cd EngineConstructorData) *Engine {
 		funcs[k] = v
 	}
 
-	listFuncs := functions.DefaultOfList()
-	for k, v := range cd.UserListFunctions {
-		listFuncs[k] = v
-	}
+	e.singleInputFunctions = funcs
 
-	e.conditionFunctions = funcs
-	e.conditionListFunctions = listFuncs
-
-	e.aggregationFunctions = functions.AllAggregateFunctions()
+	e.listAggregation = functions.AllAggregateFunctions()
+	e.listInputConstraints = functions.AllListFunctionConstraints()
 
 	return &e
 }
@@ -126,7 +123,7 @@ func (e *Engine) parseRuleInput(ruleInput RuleInput) (core.Rule, error) {
 	rule.ConditionChain = conditionsChain
 
 	for _, condition := range ruleInput.Conditions {
-		newCondition := core.NewCondition(fmt.Sprint(condition.Input), e.conditionFunctions, e.conditionListFunctions)
+		newCondition := core.NewCondition(fmt.Sprint(condition.Input), e.singleInputFunctions, functions.AllListFunctionConstraints())
 
 		for function, args := range condition.Functions {
 			err = newCondition.AddFunction(function, args)
@@ -138,18 +135,67 @@ func (e *Engine) parseRuleInput(ruleInput RuleInput) (core.Rule, error) {
 		rule.Conditions = append(rule.Conditions, *newCondition)
 	}
 
-	for _, conditionList := range ruleInput.ConditionsList {
-		newConditionList := core.NewCondition(fmt.Sprint(conditionList.Inputs), e.conditionFunctions, e.conditionListFunctions)
+	for _, inputListCondition := range ruleInput.ConditionsList {
+		newConditionList := core.NewCondition(fmt.Sprint(inputListCondition.Inputs), e.singleInputFunctions, functions.AllListFunctionConstraints())
 
-		for function, args := range conditionList.Functions {
-			err = newConditionList.AddFunction(function, args)
-			if err != nil {
-				return rule, err
+		// aggregation
+		if inputListCondition.Aggregate.Type != "" {
+			if aggregateFunction, ok := e.listAggregation.GetFunction(inputListCondition.Aggregate.Type); ok {
+				newConditionList.ListAggregateType = aggregateFunction
+			} else {
+				return rule, errors.New(fmt.Sprintf("[RULE: %s] - unknown aggregation function: %s", ruleInput.Name, inputListCondition.Aggregate.Type))
+			}
+
+			for function, args := range inputListCondition.Aggregate.Functions {
+				if _, ok := e.singleInputFunctions[function]; ok {
+					newConditionList.ListAggregateFunctions[function] = args
+				} else {
+					return rule, errors.New(fmt.Sprintf("[RULE: %s] - unknown function: %s", ruleInput.Name, function))
+				}
+			}
+		}
+
+		// list functions
+		if len(inputListCondition.ListFunctions.Functions) > 0 {
+			newConditionList.ConditionsFunctionsOfList = make(map[string][]any)
+
+			// list functions
+			for funcName, funcArgs := range inputListCondition.ListFunctions.Functions {
+				if _, ok := e.singleInputFunctions[funcName]; ok {
+					newConditionList.ConditionsFunctionsOfList[funcName] = funcArgs
+				} else {
+					return rule, errors.New(fmt.Sprintf("[RULE: %s] - unknown function of list: %s", ruleInput.Name, funcName))
+				}
+			}
+
+			// list constraints
+			for listConstraint, args := range inputListCondition.ListFunctions.Constraints {
+				if _, ok := e.listInputConstraints[listConstraint]; ok {
+					intArgs, err := toIntArray(args)
+					if err != nil {
+						return rule, errors.New(fmt.Sprintf("[RULE: %s] - error parsing constraint args of %s to int: %s", ruleInput.Name, listConstraint, err))
+					}
+					newConditionList.ListFunctionConstraints[listConstraint] = intArgs
+				} else {
+					return rule, errors.New(fmt.Sprintf("[RULE: %s] - unknown constraint of list: %s", ruleInput.Name, listConstraint))
+				}
 			}
 		}
 	}
 
 	return rule, nil
+}
+
+func toIntArray(args []any) ([]int, error) {
+	intArr := make([]int, 0)
+	for _, arg := range args {
+		intVal, err := strconv.Atoi(fmt.Sprint(arg))
+		if err != nil {
+			return intArr, err
+		}
+		intArr = append(intArr, intVal)
+	}
+	return intArr, nil
 }
 
 // extractConditionInput - extracts input or inputs value, removes it from the map

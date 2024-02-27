@@ -29,12 +29,12 @@ func TestRuleReading(t *testing.T) {
 
 	conditions1 := exampleRule1.Conditions[0]
 	assert.Equal(t, "customer.balance.usd", conditions1.Input)
-	assert.NotNil(t, conditions1.Functions["GREATER"])
-	assert.NotNil(t, conditions1.Functions["LESS_THAN"])
+	assert.NotNil(t, conditions1.Functions["Greater"])
+	assert.NotNil(t, conditions1.Functions["Lower"])
 	conditions2 := exampleRule1.Conditions[1]
 	assert.Equal(t, "customer.name", conditions2.Input)
-	assert.NotNil(t, conditions2.Functions["EQUAL"])
-	assert.NotNil(t, conditions2.Functions["EQUAL_ANY"])
+	assert.NotNil(t, conditions2.Functions["Equal"])
+	assert.NotNil(t, conditions2.Functions["EqualAny"])
 
 	// conditions list
 	conditionsList1 := exampleRule1.ConditionsList[0]
