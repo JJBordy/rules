@@ -42,6 +42,8 @@ const (
 	EqualIgnoreCase = "EqualIgnoreCase"
 	// EqualAny - the input is equal to any of the arguments
 	EqualAny = "EqualAny"
+	// EqualAnyIgnoreCase - the input is equal to any of the arguments; case-insensitive
+	EqualAnyIgnoreCase = "EqualAnyIgnoreCase"
 	// NotEqualAny - the input is not equal to any of the arguments
 	NotEqualAny = "NotEqualAny"
 	// StartsWith - the input starts with the argument
@@ -162,7 +164,16 @@ func defaultStringFunctions(m map[string]Function) map[string]Function {
 		if len(args) != 1 {
 			return false, errors.New(fmt.Sprintf("%s: needs one argument", EqualIgnoreCase))
 		}
-		return strings.ToLower(fmt.Sprint(input)) == strings.ToLower(fmt.Sprint(args[0])), nil
+		return strings.EqualFold(fmt.Sprint(input), fmt.Sprint(args[0])), nil
+	}
+
+	m[EqualAnyIgnoreCase] = func(input any, args []any) (bool, error) {
+		for _, arg := range args {
+			if strings.EqualFold(fmt.Sprint(input), fmt.Sprint(arg)) {
+				return true, nil
+			}
+		}
+		return false, nil
 	}
 
 	m[EqualAny] = func(input any, args []any) (bool, error) {

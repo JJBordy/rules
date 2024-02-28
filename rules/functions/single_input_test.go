@@ -186,13 +186,13 @@ func TestDefaultSingleInputFunctions(t *testing.T) {
 			FuncName:     NotBetween,
 			Args:         []any{1, 2},
 			Input:        2,
-			ExpectOutput: false,
+			ExpectOutput: true,
 		},
 		{
 			FuncName:     NotBetween,
 			Args:         []any{1, 2},
 			Input:        1,
-			ExpectOutput: false,
+			ExpectOutput: true,
 		},
 		{
 			FuncName:     NotBetweenEq,
@@ -214,14 +214,14 @@ func TestDefaultSingleInputFunctions(t *testing.T) {
 		},
 		{
 			FuncName:     EqualIgnoreCase,
-			Args:         []any{"a", "a"},
-			Input:        "A",
+			Args:         []any{"aBc"},
+			Input:        "AbC",
 			ExpectOutput: true,
 		},
 		{
 			FuncName:     EqualIgnoreCase,
-			Args:         []any{"a", "a"},
-			Input:        "b",
+			Args:         []any{"ABC"},
+			Input:        "abcd",
 			ExpectOutput: false,
 		},
 		{
@@ -236,45 +236,103 @@ func TestDefaultSingleInputFunctions(t *testing.T) {
 			Input:        "DEF",
 			ExpectOutput: false,
 		},
+		{
+			FuncName:     EqualAnyIgnoreCase,
+			Args:         []any{"a", "xyz", "ABC"},
+			Input:        "AbC",
+			ExpectOutput: true,
+		},
+		{
+			FuncName:     EqualAnyIgnoreCase,
+			Args:         []any{"a", "xyz", "ABC"},
+			Input:        "def",
+			ExpectOutput: false,
+		},
+		{
+			FuncName:     NotEqualAny,
+			Args:         []any{"a", "xyz", "ABC"},
+			Input:        "DEF",
+			ExpectOutput: true,
+		},
+		{
+			FuncName:     NotEqualAny,
+			Args:         []any{"a", "xyz", "ABC"},
+			Input:        "ABC",
+			ExpectOutput: false,
+		},
+		{
+			FuncName:     StartsWith,
+			Args:         []any{"Abr"},
+			Input:        "Abracadabra",
+			ExpectOutput: true,
+		},
+		{
+			FuncName:     StartsWith,
+			Args:         []any{"ABR"},
+			Input:        "Abracadabra",
+			ExpectOutput: false,
+		},
+		{
+			FuncName:     StartsWithIgnoreCase,
+			Args:         []any{"abr"},
+			Input:        "ABRACADABRA",
+			ExpectOutput: true,
+		},
+		{
+			FuncName:     StartsWithIgnoreCase,
+			Args:         []any{"abba"},
+			Input:        "ABRACADABRA",
+			ExpectOutput: false,
+		},
+		{
+			FuncName:     EndsWith,
+			Args:         []any{"bra"},
+			Input:        "Abracadabra",
+			ExpectOutput: true,
+		},
+		{
+			FuncName:     EndsWith,
+			Args:         []any{"BRA"},
+			Input:        "Abracadabra",
+			ExpectOutput: false,
+		},
+		{
+			FuncName:     EndsWithIgnoreCase,
+			Args:         []any{"bra"},
+			Input:        "ABRACADABRA",
+			ExpectOutput: true,
+		},
+		{
+			FuncName:     EndsWithIgnoreCase,
+			Args:         []any{"DARA"},
+			Input:        "ABRACADABRA",
+			ExpectOutput: false,
+		},
+		{
+			FuncName:     Contains,
+			Args:         []any{"cad"},
+			Input:        "Abracadabra",
+			ExpectOutput: true,
+		},
+		{
+			FuncName:     Contains,
+			Args:         []any{"CAD"},
+			Input:        "Abracadabra",
+			ExpectOutput: false,
+		},
+		{
+			FuncName:     ContainsIgnoreCase,
+			Args:         []any{"cad"},
+			Input:        "ABRACADABRA",
+			ExpectOutput: true,
+		},
+		{
+			FuncName:     ContainsIgnoreCase,
+			Args:         []any{"BAD"},
+			Input:        "ABRACADABRA",
+			ExpectOutput: false,
+		},
 	}
-
-	/*
-		// Greater - the input is a number and is greater than the argument
-		Greater = "Greater"
-		// GreaterEq - the input is a number and is greater or equal to the argument
-		GreaterEq = "GreaterEq"
-		// Lower - the input is a number and is lower than the argument
-		Lower = "Lower"
-		// LowerEq - the input is a number and is lower or equal to the argument
-		LowerEq = "LowerEq"
-		// Between - the input is a number and is between the two arguments
-		Between = "Between"
-		// BetweenEq - the input is a number and is between or equal to the two arguments
-		BetweenEq = "BetweenEq"
-		// NotBetween - the input is a number and is not between the two arguments
-		NotBetween = "NotBetween"
-		// NotBetweenEq - the input is a number and is not between or equal to the two arguments
-		NotBetweenEq = "NotBetweenEq"
-
-		// EqualIgnoreCase - the input is equal to the argument; case-insensitive
-		EqualIgnoreCase = "EqualIgnoreCase"
-		// EqualAny - the input is equal to any of the arguments
-		EqualAny = "EqualAny"
-		// NotEqualAny - the input is not equal to any of the arguments
-		NotEqualAny = "NotEqualAny"
-		// StartsWith - the input starts with the argument
-		StartsWith = "StartsWith"
-		// StartsWithIgnoreCase - the input starts with the argument; case-insensitive
-		StartsWithIgnoreCase = "StartsWithIgnoreCase"
-		// EndsWith - the input ends with the argument
-		EndsWith = "EndsWith"
-		// EndsWithIgnoreCase - the input ends with the argument; case-insensitive
-		EndsWithIgnoreCase = "EndsWithIgnoreCase"
-		// Contains - the input contains the argument
-		Contains = "Contains"
-		// ContainsIgnoreCase - the input contains the argument; case-insensitive
-		ContainsIgnoreCase = "ContainsIgnoreCase"
-	*/
 
 	for _, tc := range testCases {
 		t.Run(tc.FuncName, func(t *testing.T) {
