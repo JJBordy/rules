@@ -6,6 +6,115 @@ import (
 	"github.com/JJBordy/rules/rules/functions"
 )
 
+type ConditionI interface {
+	Evaluate(input map[string]any) (bool, error)
+}
+
+// InputFunction - a function that can be applied to an input, contains the function itself and the arguments
+type InputFunction struct {
+	name      string
+	args      []any
+	execution functions.Function
+}
+
+func (f InputFunction) ExecuteFunction(input any) (bool, error) {
+	return f.execution(input, f.args)
+}
+
+type SingleInputCondition struct {
+	inputPath string
+	functions []InputFunction
+}
+
+func (s SingleInputCondition) Evaluate(input map[string]any) (bool, error) {
+	for _, f := range s.functions {
+		valid, err := f.ExecuteFunction(extractFieldVal(s.inputPath, input))
+		if err != nil {
+			return false, err
+		}
+		if !valid {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+type ListInputConstraint struct {
+	args       []int
+	constraint functions.ListFunctionConstraint
+}
+
+func (lc ListInputConstraint) ExecuteConstraint(listLength int, validResults int) bool {
+	return lc.constraint(listLength, validResults, lc.args)
+}
+
+type ListInputCondition struct {
+	inputsPath  string
+	functions   []InputFunction
+	constraints []ListInputConstraint
+}
+
+func (l ListInputCondition) Evaluate(input map[string]any) (bool, error) {
+	listElements := extractFromSlice(l.inputsPath, input)
+	listValidResults := 0
+
+	for _, listElem := range listElements { // evaluating if each element of the list passes all the functions
+		elemPassedFunctions := 0
+
+		for _, f := range l.functions {
+			passed, err := f.ExecuteFunction(listElem)
+			if err != nil {
+				return false, err
+			}
+			if passed {
+				elemPassedFunctions++
+			}
+		}
+
+		if elemPassedFunctions == len(l.functions) {
+			listValidResults++
+		}
+	}
+
+	for _, c := range l.constraints {
+		constraintResult := c.ExecuteConstraint(len(listElements), listValidResults)
+		if !constraintResult {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
+type ListAggregateCondition struct {
+	inputsPath string
+	functions  []InputFunction
+
+	aggregate functions.AggregateFunction
+}
+
+func (la ListAggregateCondition) Evaluate(input map[string]any) (bool, error) {
+
+	listElements := extractFromSlice(la.inputsPath, input)
+
+	aggregationResult, err := la.aggregate(listElements)
+	if err != nil {
+		return false, err
+	}
+
+	for _, f := range la.functions {
+		valid, err := f.ExecuteFunction(aggregationResult)
+		if err != nil {
+			return false, err
+		}
+		if !valid {
+			return false, nil
+		}
+	}
+
+	return true, nil
+}
+
 // Need to have condition constructor, with ConditionData inside; as a pointer, to add functions safely
 // Then a Condition struct, reference by value, with the Evaluate function only
 

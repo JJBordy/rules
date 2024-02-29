@@ -1,0 +1,25 @@
+- name: Rule name
+  chain: OR
+  conditions:
+    single:
+      - input: customer.name
+        functions:
+          Equal: [ Ion ]
+    list:
+      - inputs: some.list.is.here[*].name
+        constraints:
+          AtLeast: [ 3 ]
+        functions:
+          Between: [ 10, 100 ]
+    aggregate:
+      - inputs: some.list.is.here[*].rating
+        type: MIN
+        functions:
+          Greater: [ 100 ]
+  map:
+    3: blue
+    5: red
+  OUTPUT_MAP:
+    file.color: $customer.age
+  OUTPUT:
+    file.size: 31

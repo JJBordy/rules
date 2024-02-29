@@ -14,10 +14,8 @@ type Engine struct {
 
 	conditionChains map[string]core.ConditionsChain
 
-	singleInputFunctions map[string]functions.Function
-
-	listAggregation functions.AggregateFunctions
-
+	inputFunctions       map[string]functions.Function
+	listAggregation      functions.AggregateFunctions
 	listInputConstraints map[string]functions.ListFunctionConstraint
 }
 
@@ -35,7 +33,7 @@ func NewEngine(cd EngineConstructorData) *Engine {
 		funcs[k] = v
 	}
 
-	e.singleInputFunctions = funcs
+	e.inputFunctions = funcs
 
 	e.listAggregation = functions.AllAggregateFunctions()
 	e.listInputConstraints = functions.AllListFunctionConstraints()
@@ -123,7 +121,7 @@ func (e *Engine) parseRuleInput(ruleInput RuleInput) (core.Rule, error) {
 	rule.ConditionChain = conditionsChain
 
 	for _, condition := range ruleInput.Conditions {
-		newCondition := core.NewCondition(fmt.Sprint(condition.Input), e.singleInputFunctions, functions.AllListFunctionConstraints())
+		newCondition := core.NewCondition(fmt.Sprint(condition.Input), e.inputFunctions, functions.AllListFunctionConstraints())
 
 		for function, args := range condition.Functions {
 			err = newCondition.AddFunction(function, args)
@@ -136,7 +134,7 @@ func (e *Engine) parseRuleInput(ruleInput RuleInput) (core.Rule, error) {
 	}
 
 	for _, inputListCondition := range ruleInput.ConditionsList {
-		newConditionList := core.NewCondition(fmt.Sprint(inputListCondition.Inputs), e.singleInputFunctions, functions.AllListFunctionConstraints())
+		newConditionList := core.NewCondition(fmt.Sprint(inputListCondition.Inputs), e.inputFunctions, functions.AllListFunctionConstraints())
 
 		// aggregation
 		if inputListCondition.Aggregate.Type != "" {
@@ -147,7 +145,7 @@ func (e *Engine) parseRuleInput(ruleInput RuleInput) (core.Rule, error) {
 			}
 
 			for function, args := range inputListCondition.Aggregate.Functions {
-				if _, ok := e.singleInputFunctions[function]; ok {
+				if _, ok := e.inputFunctions[function]; ok {
 					newConditionList.ListAggregateFunctions[function] = args
 				} else {
 					return rule, errors.New(fmt.Sprintf("[RULE: %s] - unknown function: %s", ruleInput.Name, function))
@@ -161,7 +159,7 @@ func (e *Engine) parseRuleInput(ruleInput RuleInput) (core.Rule, error) {
 
 			// list functions
 			for funcName, funcArgs := range inputListCondition.ListFunctions.Functions {
-				if _, ok := e.singleInputFunctions[funcName]; ok {
+				if _, ok := e.inputFunctions[funcName]; ok {
 					newConditionList.ConditionsFunctionsOfList[funcName] = funcArgs
 				} else {
 					return rule, errors.New(fmt.Sprintf("[RULE: %s] - unknown function of list: %s", ruleInput.Name, funcName))

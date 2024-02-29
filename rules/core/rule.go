@@ -20,6 +20,19 @@ type Rule struct {
 	OutputMap map[string]string
 }
 
+type RuleNew struct {
+	Name string
+
+	ConditionChain *ConditionsChain
+
+	Conditions []ConditionI
+
+	Map map[string]interface{}
+
+	Output    map[string]interface{}
+	OutputMap map[string]string
+}
+
 func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface{}, error) {
 	out := make(map[string]interface{})
 
@@ -37,6 +50,7 @@ func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface
 		return out, nil
 	}
 
+	// needs to be separated
 	for outPath, inPath := range r.OutputMap {
 		if strings.Contains(inPath, "[*]") {
 			fieldListValues := extractFromSlice(inPath, input)
