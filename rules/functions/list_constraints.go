@@ -21,6 +21,32 @@ const (
 
 type ListFunctionConstraint func(listTotal, passedTotal int, args []int) bool
 
+// TODO: validate the number of arguments passed are correct
+
+// ListFunctionConstraintsArgumentNumber - number of arguments expected for each function
+func ListFunctionConstraintsArgumentNumber(constraintName string) int {
+	switch constraintName {
+	case All:
+		return 0
+	case AtLeast:
+		return 1
+	case AtMost:
+		return 1
+	case Exactly:
+		return 1
+	case None:
+		return 0
+	case AtLeastFraction:
+		return 2
+	case AtMostFraction:
+		return 2
+	default:
+		return -1
+	}
+}
+
+// TODO: default list constraint is All
+
 func AllListFunctionConstraints() map[string]ListFunctionConstraint {
 	allConstraints := make(map[string]ListFunctionConstraint)
 
@@ -29,11 +55,11 @@ func AllListFunctionConstraints() map[string]ListFunctionConstraint {
 	}
 
 	allConstraints[AtLeast] = func(listTotal, passedTotal int, args []int) bool {
-		return args[0] >= passedTotal
+		return passedTotal >= args[0]
 	}
 
 	allConstraints[AtMost] = func(listTotal, passedTotal int, args []int) bool {
-		return args[0] <= passedTotal
+		return passedTotal <= args[0]
 	}
 
 	allConstraints[Exactly] = func(listTotal, passedTotal int, args []int) bool {

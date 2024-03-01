@@ -52,7 +52,7 @@ func TestDefaultSingleInputFunctions(t *testing.T) {
 		{
 			FuncName:     Equal,
 			Args:         []any{"SOMETHING"},
-			Input:        "SOMETHINGELSE",
+			Input:        "SOMETHING ELSE",
 			ExpectOutput: false,
 		},
 		{
