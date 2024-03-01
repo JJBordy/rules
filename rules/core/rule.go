@@ -5,21 +5,6 @@ import (
 	"strings"
 )
 
-type Rule struct {
-	Name     string
-	ID       string
-	Priority int
-
-	Conditions []Condition
-
-	ConditionChain *ConditionsChain
-
-	Map map[string]interface{}
-
-	Output    map[string]interface{}
-	OutputMap map[string]string
-}
-
 type RuleNew struct {
 	Name string
 
@@ -33,7 +18,7 @@ type RuleNew struct {
 	OutputMap map[string]string
 }
 
-func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface{}, error) {
+func (r RuleNew) GenerateOutput(input map[string]interface{}) (map[string]interface{}, error) {
 	out := make(map[string]interface{})
 
 	rulePasses, err := r.ConditionChain.EvaluateConditions(input, r.Conditions)
@@ -82,7 +67,7 @@ func (r Rule) GenerateOutput(input map[string]interface{}) (map[string]interface
 	return out, nil
 }
 
-func (r Rule) DebugOutput(input map[string]interface{}) ([]DebugConditions, map[string]interface{}, error) {
+func (r RuleNew) DebugOutput(input map[string]interface{}) ([]DebugCondition, map[string]interface{}, error) {
 	defer func() {
 		r.ConditionChain.TurnDebugOFF()
 	}()

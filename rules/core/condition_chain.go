@@ -31,7 +31,7 @@ var validChainTypes = map[string]bool{
 
 type ConditionsChain struct {
 	doDebug             bool
-	debugOutput         []DebugConditions
+	debugOutput         []DebugCondition
 	conditionsChainType string
 }
 
@@ -44,7 +44,7 @@ func NewConditionChain(conditionsChainType string) (*ConditionsChain, error) {
 	}
 
 	return &ConditionsChain{
-		debugOutput:         make([]DebugConditions, 0),
+		debugOutput:         make([]DebugCondition, 0),
 		conditionsChainType: conditionsChainType,
 	}, nil
 }
@@ -57,7 +57,7 @@ func (cc *ConditionsChain) TurnDebugOFF() {
 	cc.doDebug = false
 }
 
-func (cc *ConditionsChain) EvaluateConditions(input map[string]interface{}, conditions []Condition) (bool, error) {
+func (cc *ConditionsChain) EvaluateConditions(input map[string]interface{}, conditions []ConditionI) (bool, error) {
 	switch cc.conditionsChainType {
 	case AND:
 		return cc.evaluateAND(input, conditions)
@@ -76,12 +76,12 @@ func (cc *ConditionsChain) EvaluateConditions(input map[string]interface{}, cond
 	}
 }
 
-func (cc *ConditionsChain) evaluateXNOR(input map[string]interface{}, conditions []Condition) (bool, error) {
+func (cc *ConditionsChain) evaluateXNOR(input map[string]interface{}, conditions []ConditionI) (bool, error) {
 	passed, err := cc.evaluateXOR(input, conditions)
 	return !passed, err
 }
 
-func (cc *ConditionsChain) evaluateXOR(input map[string]interface{}, conditions []Condition) (bool, error) {
+func (cc *ConditionsChain) evaluateXOR(input map[string]interface{}, conditions []ConditionI) (bool, error) {
 	passedConditions := 0
 
 	for _, condition := range conditions {
@@ -97,17 +97,17 @@ func (cc *ConditionsChain) evaluateXOR(input map[string]interface{}, conditions 
 	return passedConditions == 1, nil
 }
 
-func (cc *ConditionsChain) evaluateNOR(input map[string]interface{}, conditions []Condition) (bool, error) {
+func (cc *ConditionsChain) evaluateNOR(input map[string]interface{}, conditions []ConditionI) (bool, error) {
 	passed, err := cc.evaluateOR(input, conditions)
 	return !passed, err
 }
 
-func (cc *ConditionsChain) evaluateNAND(input map[string]interface{}, conditions []Condition) (bool, error) {
+func (cc *ConditionsChain) evaluateNAND(input map[string]interface{}, conditions []ConditionI) (bool, error) {
 	passed, err := cc.evaluateAND(input, conditions)
 	return !passed, err
 }
 
-func (cc *ConditionsChain) evaluateAND(input map[string]interface{}, conditions []Condition) (bool, error) {
+func (cc *ConditionsChain) evaluateAND(input map[string]interface{}, conditions []ConditionI) (bool, error) {
 	passedConditions := 0
 
 	for _, condition := range conditions {
@@ -123,7 +123,7 @@ func (cc *ConditionsChain) evaluateAND(input map[string]interface{}, conditions 
 	return passedConditions == len(conditions), nil
 }
 
-func (cc *ConditionsChain) evaluateOR(input map[string]interface{}, conditions []Condition) (bool, error) {
+func (cc *ConditionsChain) evaluateOR(input map[string]interface{}, conditions []ConditionI) (bool, error) {
 	for _, condition := range conditions {
 		passed, err := cc.evaluateCondition(input, condition)
 		if err != nil {
@@ -137,11 +137,11 @@ func (cc *ConditionsChain) evaluateOR(input map[string]interface{}, conditions [
 	return false, nil
 }
 
-func (cc *ConditionsChain) DebugOutput() []DebugConditions {
+func (cc *ConditionsChain) DebugOutput() []DebugCondition {
 	return cc.debugOutput
 }
 
-func (cc *ConditionsChain) evaluateCondition(input map[string]interface{}, c Condition) (bool, error) {
+func (cc *ConditionsChain) evaluateCondition(input map[string]interface{}, c ConditionI) (bool, error) {
 
 	defer func() {
 		if cc.doDebug {
@@ -158,29 +158,10 @@ type DebugConditions struct {
 }
 
 type DebugCondition struct {
-	FunctionName string
-	FunctionArgs []any
+	InputPath string
+	Functions []string
 }
 
-func (cc *ConditionsChain) debugCondition(c Condition) {
-	debugConditions := make([]DebugCondition, 0)
-
-	for funcName, funcArgs := range c.ConditionFunctions {
-		debugConditions = append(debugConditions, DebugCondition{
-			FunctionName: funcName,
-			FunctionArgs: funcArgs,
-		})
-	}
-
-	for funcName, funcArgs := range c.ConditionsFunctionsOfList {
-		debugConditions = append(debugConditions, DebugCondition{
-			FunctionName: funcName,
-			FunctionArgs: funcArgs,
-		})
-	}
-
-	cc.debugOutput = append(cc.debugOutput, DebugConditions{
-		Input:            c.InputPath,
-		FailedConditions: debugConditions,
-	})
+func (cc *ConditionsChain) debugCondition(c ConditionI) {
+	cc.debugOutput = append(cc.debugOutput, c.DebugInfo())
 }

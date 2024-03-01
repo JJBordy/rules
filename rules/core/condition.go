@@ -1,13 +1,13 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"github.com/JJBordy/rules/rules/functions"
 )
 
 type ConditionI interface {
 	Evaluate(input map[string]any) (bool, error)
+	DebugInfo() DebugCondition
 }
 
 // InputFunction - a function that can be applied to an input, contains the function itself and the arguments
@@ -17,10 +17,19 @@ type InputFunction struct {
 	execution functions.Function
 }
 
+func NewInputFunction(name string, args []any, execution functions.Function) InputFunction {
+	return InputFunction{
+		name:      name,
+		args:      args,
+		execution: execution,
+	}
+}
+
 func (f InputFunction) ExecuteFunction(input any) (bool, error) {
 	return f.execution(input, f.args)
 }
 
+// SingleInputCondition - a condition that can be applied to a single input
 type SingleInputCondition struct {
 	inputPath string
 	functions []InputFunction
@@ -39,9 +48,35 @@ func (s SingleInputCondition) Evaluate(input map[string]any) (bool, error) {
 	return true, nil
 }
 
+func (s SingleInputCondition) DebugInfo() DebugCondition {
+	functionsPrint := make([]string, 0)
+	for _, f := range s.functions {
+		functionsPrint = append(functionsPrint, fmt.Sprintf("%#v", f))
+	}
+	return DebugCondition{
+		InputPath: s.inputPath,
+		Functions: functionsPrint,
+	}
+}
+
+func NewSingleInputCondition(inputPath string, functions []InputFunction) SingleInputCondition {
+	return SingleInputCondition{
+		inputPath: inputPath,
+		functions: functions,
+	}
+}
+
 type ListInputConstraint struct {
 	args       []int
 	constraint functions.ListFunctionConstraint
+}
+
+func NewListInputConstraint(args []int, constraint functions.ListFunctionConstraint) ListInputConstraint {
+	// TODO: validate number of arguments passed to the function (1 or 2, when creating a new one)
+	return ListInputConstraint{
+		args:       args,
+		constraint: constraint,
+	}
 }
 
 func (lc ListInputConstraint) ExecuteConstraint(listLength int, validResults int) bool {
@@ -52,6 +87,14 @@ type ListInputCondition struct {
 	inputsPath  string
 	functions   []InputFunction
 	constraints []ListInputConstraint
+}
+
+func NewListInputCondition(inputsPath string, functions []InputFunction, constraints []ListInputConstraint) ListInputCondition {
+	return ListInputCondition{
+		inputsPath:  inputsPath,
+		functions:   functions,
+		constraints: constraints,
+	}
 }
 
 func (l ListInputCondition) Evaluate(input map[string]any) (bool, error) {
@@ -86,11 +129,33 @@ func (l ListInputCondition) Evaluate(input map[string]any) (bool, error) {
 	return true, nil
 }
 
+func (l ListInputCondition) DebugInfo() DebugCondition {
+	functionsPrint := make([]string, 0)
+	for _, c := range l.constraints {
+		functionsPrint = append(functionsPrint, fmt.Sprintf("%#v", c))
+	}
+	for _, f := range l.functions {
+		functionsPrint = append(functionsPrint, fmt.Sprintf("%#v", f))
+	}
+	return DebugCondition{
+		InputPath: l.inputsPath,
+		Functions: functionsPrint,
+	}
+}
+
 type ListAggregateCondition struct {
 	inputsPath string
 	functions  []InputFunction
 
 	aggregate functions.AggregateFunction
+}
+
+func NewAggregateCondition(inputsPath string, functions []InputFunction, aggregate functions.AggregateFunction) ListAggregateCondition {
+	return ListAggregateCondition{
+		inputsPath: inputsPath,
+		functions:  functions,
+		aggregate:  aggregate,
+	}
 }
 
 func (la ListAggregateCondition) Evaluate(input map[string]any) (bool, error) {
@@ -115,125 +180,14 @@ func (la ListAggregateCondition) Evaluate(input map[string]any) (bool, error) {
 	return true, nil
 }
 
-// Need to have condition constructor, with ConditionData inside; as a pointer, to add functions safely
-// Then a Condition struct, reference by value, with the Evaluate function only
+func (la ListAggregateCondition) DebugInfo() DebugCondition {
+	functionsPrint := make([]string, 0)
 
-type Condition struct {
-	InputPath string
-
-	// functions defined in the engine
-	EngineFunctions map[string]functions.Function
-
-	// definitions of functions to apply for the condition to be valid
-	// single input
-	ConditionFunctions map[string][]any // function name & arguments
-	// list input
-	ConditionsFunctionsOfList     map[string][]any
-	EngineListFunctionConstraints map[string]functions.ListFunctionConstraint
-
-	ListFunctionConstraints map[string][]int // constraint name & arguments
-
-	ListAggregateType      functions.AggregateFunction
-	ListAggregateFunctions map[string][]any
-}
-
-func NewCondition(inputPath string, engineFunctions map[string]functions.Function, engineListFunctionConstraints map[string]functions.ListFunctionConstraint) *Condition {
-	return &Condition{
-		InputPath:                     inputPath,
-		EngineFunctions:               engineFunctions,
-		ConditionFunctions:            make(map[string][]any),
-		ConditionsFunctionsOfList:     make(map[string][]any),
-		EngineListFunctionConstraints: engineListFunctionConstraints,
+	for _, f := range la.functions {
+		functionsPrint = append(functionsPrint, fmt.Sprintf("%#v", f))
 	}
-}
-
-// AddFunction - include function key and arguments in the condition
-func (c *Condition) AddFunction(funcName string, funcArgs any) error {
-	if _, isDefined := c.EngineFunctions[funcName]; isDefined {
-		return c.addFunction(funcName, funcArgs)
-	} else {
-		return errors.New(fmt.Sprintf("function: [%s] is not defined in the engine", funcName))
+	return DebugCondition{
+		InputPath: la.inputsPath,
+		Functions: functionsPrint,
 	}
-}
-
-func (c *Condition) addFunction(funcName string, funcArgs any) error {
-	if args, isSlice := funcArgs.([]any); isSlice {
-		c.ConditionFunctions[funcName] = args
-		return nil
-	}
-	return errors.New(fmt.Sprintf("function: [%s] arguments must be of type []any", funcName))
-}
-
-func (c *Condition) addFunctionOfList(funcName string, funcArgs any) error {
-	if args, ok := funcArgs.([]any); ok {
-		c.ConditionsFunctionsOfList[funcName] = args
-	}
-	return errors.New(fmt.Sprintf("function: [%s] arguments must be of type []any", funcName))
-}
-
-// Evaluate - evaluate the condition for the given input
-func (c *Condition) Evaluate(input map[string]interface{}) (bool, error) {
-
-	// single input evaluation
-	for funcName, funcArgs := range c.ConditionFunctions {
-		valid, err := c.EngineFunctions[funcName](extractFieldVal(c.InputPath, input), funcArgs)
-		if err != nil {
-			return false, err
-		}
-		if !valid {
-			return false, nil
-		}
-	}
-
-	// list aggregate evaluation
-	if c.ListAggregateType != nil {
-		aggregationResult, err := c.ListAggregateType(extractFromSlice(c.InputPath, input))
-		if err != nil {
-			return false, err
-		}
-		for funcName, funcArgs := range c.ListAggregateFunctions {
-			resultTrue, err := c.EngineFunctions[funcName](aggregationResult, funcArgs)
-			if err != nil {
-				return false, err
-			}
-			if !resultTrue {
-				return false, nil
-			}
-		}
-	}
-
-	// functions for lists
-
-	listElements := extractFromSlice(c.InputPath, input)
-	listValidResults := 0
-
-	for _, listElem := range listElements {
-
-		elemPassedFunctions := 0
-
-		for funcName, funcArgs := range c.ConditionsFunctionsOfList {
-
-			passed, err := c.EngineFunctions[funcName](listElem, funcArgs)
-			if err != nil {
-				return false, err
-			}
-			if passed {
-				elemPassedFunctions++
-			}
-		}
-
-		if elemPassedFunctions == len(c.ConditionsFunctionsOfList) {
-			listValidResults++
-		}
-
-	}
-
-	for listFunctionConstraint, constraintArgs := range c.ListFunctionConstraints {
-		constraintResult := c.EngineListFunctionConstraints[listFunctionConstraint](len(listElements), listValidResults, constraintArgs)
-		if !constraintResult {
-			return false, nil
-		}
-	}
-
-	return true, nil
 }

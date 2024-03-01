@@ -10,7 +10,7 @@ import (
 )
 
 type Engine struct {
-	ruleSets map[string][]core.Rule
+	ruleSets map[string][]core.RuleNew
 
 	conditionChains map[string]core.ConditionsChain
 
@@ -25,7 +25,7 @@ type EngineConstructorData struct {
 
 func NewEngine(cd EngineConstructorData) *Engine {
 	e := Engine{
-		ruleSets: make(map[string][]core.Rule),
+		ruleSets: make(map[string][]core.RuleNew),
 	}
 
 	funcs := functions.Default()
@@ -88,8 +88,8 @@ func (e *Engine) DebugSet(setName string, input map[string]interface{}) (map[str
 	return debugOutput, builtOutput, nil
 }
 
-func (e *Engine) CreateSet(setName string, ruleInputs []RuleInput) error {
-	parsedRules := make([]core.Rule, 0)
+func (e *Engine) CreateSet(setName string, ruleInputs []RuleInputNew) error {
+	parsedRules := make([]core.RuleNew, 0)
 
 	for _, r := range ruleInputs {
 		parsedRule, err := e.parseRuleInput(r)
@@ -104,81 +104,89 @@ func (e *Engine) CreateSet(setName string, ruleInputs []RuleInput) error {
 	return nil
 }
 
-func (e *Engine) parseRuleInput(ruleInput RuleInput) (core.Rule, error) {
-	rule := core.Rule{
+func (e *Engine) parseRuleInput(ruleInput RuleInputNew) (core.RuleNew, error) {
+	rule := core.RuleNew{
 		Name:       ruleInput.Name,
-		ID:         ruleInput.ID,
 		Map:        ruleInput.Map,
 		Output:     ruleInput.Output,
 		OutputMap:  ruleInput.OutputMap,
-		Conditions: make([]core.Condition, 0),
+		Conditions: make([]core.ConditionI, 0),
 	}
 
-	conditionsChain, err := core.NewConditionChain(ruleInput.ConditionsChain)
+	conditionsChain, err := core.NewConditionChain(ruleInput.ConditionsChainType)
 	if err != nil {
 		return rule, err
 	}
 	rule.ConditionChain = conditionsChain
 
-	for _, condition := range ruleInput.Conditions {
-		newCondition := core.NewCondition(fmt.Sprint(condition.Input), e.inputFunctions, functions.AllListFunctionConstraints())
+	// single input conditions
+	for _, sic := range ruleInput.Conditions.SingleInputConditions {
+		inputFunctions := make([]core.InputFunction, 0)
 
-		for function, args := range condition.Functions {
-			err = newCondition.AddFunction(function, args)
-			if err != nil {
-				return rule, err
+		for funcName, funcArgs := range sic.Functions {
+			if function, ok := e.inputFunctions[funcName]; ok {
+				inputFunctions = append(inputFunctions, core.NewInputFunction(funcName, funcArgs, function))
+			} else {
+				return rule, errors.New(fmt.Sprintf("[RULE: %s] function: [%s: [%+v]] is not defined in the engine", ruleInput.Name, funcName, funcArgs))
 			}
 		}
 
-		rule.Conditions = append(rule.Conditions, *newCondition)
+		singleInputCondition := core.NewSingleInputCondition(sic.InputPath, inputFunctions)
+		rule.Conditions = append(rule.Conditions, singleInputCondition)
 	}
 
-	for _, inputListCondition := range ruleInput.ConditionsList {
-		newConditionList := core.NewCondition(fmt.Sprint(inputListCondition.Inputs), e.inputFunctions, functions.AllListFunctionConstraints())
+	// list aggregate functions
+	for _, lac := range ruleInput.Conditions.ListAggregateConditions {
 
-		// aggregation
-		if inputListCondition.Aggregate.Type != "" {
-			if aggregateFunction, ok := e.listAggregation.GetFunction(inputListCondition.Aggregate.Type); ok {
-				newConditionList.ListAggregateType = aggregateFunction
+		inputFunctions := make([]core.InputFunction, 0)
+		for funcName, funcArgs := range lac.Functions {
+			if function, ok := e.inputFunctions[funcName]; ok {
+				inputFunctions = append(inputFunctions, core.NewInputFunction(funcName, funcArgs, function))
 			} else {
-				return rule, errors.New(fmt.Sprintf("[RULE: %s] - unknown aggregation function: %s", ruleInput.Name, inputListCondition.Aggregate.Type))
-			}
-
-			for function, args := range inputListCondition.Aggregate.Functions {
-				if _, ok := e.inputFunctions[function]; ok {
-					newConditionList.ListAggregateFunctions[function] = args
-				} else {
-					return rule, errors.New(fmt.Sprintf("[RULE: %s] - unknown function: %s", ruleInput.Name, function))
-				}
+				return rule, errors.New(fmt.Sprintf("[RULE: %s] function: [%s: [%+v]] is not defined in the engine", ruleInput.Name, funcName, funcArgs))
 			}
 		}
 
-		// list functions
-		if len(inputListCondition.ListFunctions.Functions) > 0 {
-			newConditionList.ConditionsFunctionsOfList = make(map[string][]any)
+		if aggregateFunction, ok := e.listAggregation.GetFunction(lac.AggregateType); ok {
+			aggregateCondition := core.NewAggregateCondition(lac.InputsPath, inputFunctions, aggregateFunction)
+			rule.Conditions = append(rule.Conditions, aggregateCondition)
+		} else {
+			return rule, errors.New(fmt.Sprintf("[RULE: %s] - unknown aggregation function: %s", ruleInput.Name, lac.AggregateType))
+		}
+	}
 
-			// list functions
-			for funcName, funcArgs := range inputListCondition.ListFunctions.Functions {
-				if _, ok := e.inputFunctions[funcName]; ok {
-					newConditionList.ConditionsFunctionsOfList[funcName] = funcArgs
-				} else {
-					return rule, errors.New(fmt.Sprintf("[RULE: %s] - unknown function of list: %s", ruleInput.Name, funcName))
-				}
+	// list input conditions
+	for _, lic := range ruleInput.Conditions.ListInputConditions {
+
+		inputFunctions := make([]core.InputFunction, 0)
+		for funcName, funcArgs := range lic.Functions {
+			if function, ok := e.inputFunctions[funcName]; ok {
+				inputFunctions = append(inputFunctions, core.NewInputFunction(funcName, funcArgs, function))
+			} else {
+				return rule, errors.New(fmt.Sprintf("[RULE: %s] function: [%s: [%+v]] is not defined in the engine", ruleInput.Name, funcName, funcArgs))
 			}
+		}
 
-			// list constraints
-			for listConstraint, args := range inputListCondition.ListFunctions.Constraints {
-				if _, ok := e.listInputConstraints[listConstraint]; ok {
-					intArgs, err := toIntArray(args)
-					if err != nil {
-						return rule, errors.New(fmt.Sprintf("[RULE: %s] - error parsing constraint args of %s to int: %s", ruleInput.Name, listConstraint, err))
+		listInputConstraints := make([]core.ListInputConstraint, 0)
+		for constraintName, constraintArgs := range lic.Constraints {
+			if listConstraintFunction, ok := e.listInputConstraints[constraintName]; ok {
+				argsAsInt := make([]int, 0)
+				for _, arg := range constraintArgs {
+					if i, err := strconv.Atoi(fmt.Sprint(arg)); err == nil {
+						argsAsInt = append(argsAsInt, i)
+					} else {
+						return rule, errors.New(fmt.Sprintf("[RULE: %s] constraint: [%s: [%+v]] args are not integers", ruleInput.Name, constraintName, constraintArgs))
 					}
-					newConditionList.ListFunctionConstraints[listConstraint] = intArgs
-				} else {
-					return rule, errors.New(fmt.Sprintf("[RULE: %s] - unknown constraint of list: %s", ruleInput.Name, listConstraint))
 				}
+
+				listInputConstraints = append(listInputConstraints, core.NewListInputConstraint(argsAsInt, listConstraintFunction))
+			} else {
+				return rule, errors.New(fmt.Sprintf("[RULE: %s] constraint: [%s: [%+v]] is not defined in the engine", ruleInput.Name, constraintName, constraintArgs))
 			}
 		}
+
+		listInputCondition := core.NewListInputCondition(lic.InputsPath, inputFunctions, listInputConstraints)
+		rule.Conditions = append(rule.Conditions, listInputCondition)
 	}
 
 	return rule, nil

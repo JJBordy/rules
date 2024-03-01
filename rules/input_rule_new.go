@@ -1,4 +1,4 @@
-package output
+package rules
 
 type RuleInputNew struct {
 	Name                string `yaml:"name"`
