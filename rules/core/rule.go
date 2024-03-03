@@ -10,7 +10,7 @@ type RuleNew struct {
 
 	ConditionChain *ConditionsChain
 
-	Conditions []ConditionI
+	Conditions []Condition
 
 	Map map[string]interface{}
 

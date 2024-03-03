@@ -57,7 +57,3 @@ func extractFieldVal(path string, input map[string]interface{}) any {
 
 	return nil
 }
-
-func extractFieldList(path string, input map[string]interface{}) []any {
-	return extractFromSlice(path, input)
-}

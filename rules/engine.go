@@ -110,7 +110,7 @@ func (e *Engine) parseRuleInput(ruleInput RuleInputNew) (core.RuleNew, error) {
 		Map:        ruleInput.Map,
 		Output:     ruleInput.Output,
 		OutputMap:  ruleInput.OutputMap,
-		Conditions: make([]core.ConditionI, 0),
+		Conditions: make([]core.Condition, 0),
 	}
 
 	conditionsChain, err := core.NewConditionChain(ruleInput.ConditionsChainType)

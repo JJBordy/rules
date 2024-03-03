@@ -12,9 +12,9 @@ type RuleInputNew struct {
 }
 
 type RuleInputConditions struct {
-	SingleInputConditions   []ConditionSingleInput   `yaml:"singleInput"`
-	ListInputConditions     []ConditionListInput     `yaml:"listInput"`
-	ListAggregateConditions []ConditionListAggregate `yaml:"listAggregate"`
+	SingleInputConditions   []ConditionSingleInput   `yaml:"single"`
+	ListInputConditions     []ConditionListInput     `yaml:"list"`
+	ListAggregateConditions []ConditionListAggregate `yaml:"aggregate"`
 }
 
 type ConditionSingleInput struct {

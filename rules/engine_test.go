@@ -15,7 +15,7 @@ func TestEngine(t *testing.T) {
 	fileContent, err := os.ReadFile("../testdata/simple_rule.yaml")
 	assert.Nil(t, err)
 
-	var carRentalRules []RuleInput
+	var carRentalRules []RuleInputNew
 	err = yaml.Unmarshal(fileContent, &carRentalRules)
 	assert.Nil(t, err)
 

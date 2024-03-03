@@ -4,7 +4,7 @@
     single:
       - input: customer.name
         functions:
-          Equal: [ Ion ]
+          Equal: [ John ]
     list:
       - inputs: some.list.is.here[*].name
         constraints:
