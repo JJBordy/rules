@@ -1,6 +1,6 @@
 package rules
 
-type RuleInputNew struct {
+type RuleInput struct {
 	Name                string `yaml:"name"`
 	ConditionsChainType string `yaml:"chain"`
 

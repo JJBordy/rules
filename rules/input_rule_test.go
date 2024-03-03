@@ -15,7 +15,7 @@ func TestRuleReading(t *testing.T) {
 		t.Fatal("could not read yaml file")
 	}
 
-	var rules []RuleInputNew
+	var rules []RuleInput
 
 	err = yaml.Unmarshal(c, &rules)
 	if err != nil {

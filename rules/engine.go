@@ -10,7 +10,7 @@ import (
 )
 
 type Engine struct {
-	ruleSets map[string][]core.RuleNew
+	ruleSets map[string][]core.Rule
 
 	conditionChains map[string]core.ConditionsChain
 
@@ -23,15 +23,19 @@ type EngineConstructorData struct {
 	UserFunctions map[string]functions.Function
 }
 
-func NewEngine(cd EngineConstructorData) *Engine {
+func NewEngineCustom(cd EngineConstructorData) *Engine {
+	engine := NewEngine()
+	for k, v := range cd.UserFunctions {
+		engine.inputFunctions[k] = v
+	}
+	return engine
+}
+func NewEngine() *Engine {
 	e := Engine{
-		ruleSets: make(map[string][]core.RuleNew),
+		ruleSets: make(map[string][]core.Rule),
 	}
 
 	funcs := functions.Default()
-	for k, v := range cd.UserFunctions {
-		funcs[k] = v
-	}
 
 	e.inputFunctions = funcs
 
@@ -88,8 +92,8 @@ func (e *Engine) DebugSet(setName string, input map[string]interface{}) (map[str
 	return debugOutput, builtOutput, nil
 }
 
-func (e *Engine) CreateSet(setName string, ruleInputs []RuleInputNew) error {
-	parsedRules := make([]core.RuleNew, 0)
+func (e *Engine) CreateSet(setName string, ruleInputs []RuleInput) error {
+	parsedRules := make([]core.Rule, 0)
 
 	for _, r := range ruleInputs {
 		parsedRule, err := e.parseRuleInput(r)
@@ -104,8 +108,8 @@ func (e *Engine) CreateSet(setName string, ruleInputs []RuleInputNew) error {
 	return nil
 }
 
-func (e *Engine) parseRuleInput(ruleInput RuleInputNew) (core.RuleNew, error) {
-	rule := core.RuleNew{
+func (e *Engine) parseRuleInput(ruleInput RuleInput) (core.Rule, error) {
+	rule := core.Rule{
 		Name:       ruleInput.Name,
 		Map:        ruleInput.Map,
 		Output:     ruleInput.Output,
@@ -190,29 +194,4 @@ func (e *Engine) parseRuleInput(ruleInput RuleInputNew) (core.RuleNew, error) {
 	}
 
 	return rule, nil
-}
-
-func toIntArray(args []any) ([]int, error) {
-	intArr := make([]int, 0)
-	for _, arg := range args {
-		intVal, err := strconv.Atoi(fmt.Sprint(arg))
-		if err != nil {
-			return intArr, err
-		}
-		intArr = append(intArr, intVal)
-	}
-	return intArr, nil
-}
-
-// extractConditionInput - extracts input or inputs value, removes it from the map
-func extractConditionInput(cond map[string]interface{}) (string, error) {
-	if inputPath, ok := cond["input"]; ok {
-		delete(cond, "input")
-		return fmt.Sprint(inputPath), nil
-	}
-	if inputListPath, ok := cond["inputs"]; ok {
-		delete(cond, "inputs")
-		return fmt.Sprint(inputListPath), nil
-	}
-	return "", errors.New("no input specification in condition")
 }
