@@ -1,6 +1,6 @@
 # simple-rules
 
-Basic minimal rules engine, uses yaml input
+Basic minimal rules engine, uses yaml as text input.
 
 It is called 'simple rules' because it will have an input and will produce another; non-recursively.
 
@@ -11,19 +11,13 @@ The goal is to have well-defined and well explained schema for the conditions.
 
 ### ROADMAP BEFORE 1.0:
 
-* modify the structure for CONDITIONS / CONDITIONS_LIST
-* Reference array elements
-* add all the built-in functions necessary
-* use testify for tests
-* add meaningful tests for all .go files
-* create good and meaningful examples
-* ask feedback before publishing
-* publish
+* process dates
+* for function arguments: allow to pass input values, not just fixed values (Greater: [ config.max ])
 
 ### POST 1.0 ROADMAP:
 
 * Rules will be able to have a priority (rules with higher priority will be executed latest and override any previous
   output)
-* Rules will gain ID and conditions will be able to reference other rules
-* Maybe: full rules engine: will be able to reference the generated output in conditions
-* Maybe: output functions (random, time, capitalize string, etc)
+* Rules will gain IDs and conditions will be able to reference other rules (if rule X and rule Y are true/false, then...)
+* Possible: full rules engine, will be able to reference the generated output in conditions
+* Possible: output functions (random, time, capitalize string, math operations, etc)

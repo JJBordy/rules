@@ -158,13 +158,24 @@ func (cc *ConditionsChain) DebugOutput() []DebugCondition {
 
 func (cc *ConditionsChain) evaluateCondition(input map[string]interface{}, c Condition) (bool, error) {
 
+	var writeDebug bool
+
 	defer func() {
-		if cc.doDebug {
+		if cc.doDebug && writeDebug {
 			cc.debugCondition(c)
 		}
 	}()
 
-	return c.Evaluate(input)
+	passes, err := c.Evaluate(input)
+	if err != nil {
+		return false, err
+	}
+
+	if !passes {
+		writeDebug = true
+	}
+
+	return passes, nil
 }
 
 type DebugConditions struct {

@@ -16,10 +16,11 @@
         type: MIN
         functions:
           Greater: [ 100 ]
-  map:
+  MAP:
     3: blue
     5: red
   OUTPUT_MAP:
     file.color: $customer.age
   OUTPUT:
     file.size: 31
+# allow for input: $customer.age (from within the model)

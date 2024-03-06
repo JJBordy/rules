@@ -6,9 +6,9 @@ type RuleInput struct {
 
 	Conditions RuleInputConditions `yaml:"conditions"`
 
-	Output    map[string]interface{} `yaml:"output"`
-	Map       map[string]interface{} `yaml:"map"`
-	OutputMap map[string]string      `yaml:"outputMap"`
+	Output    map[string]interface{} `yaml:"OUTPUT"`
+	Map       map[string]interface{} `yaml:"MAP"`
+	OutputMap map[string]string      `yaml:"OUTPUT_MAP"`
 }
 
 type RuleInputConditions struct {

@@ -51,4 +51,9 @@ func TestRuleReading(t *testing.T) {
 	assert.Equal(t, functions.MIN, aggregateCondition.AggregateType)
 	assert.Equal(t, 1, len(aggregateCondition.Functions))
 	assert.Equal(t, []any{100}, aggregateCondition.Functions[functions.Greater])
+
+	// output
+	assert.NotNil(t, rules[0].Output)
+	assert.NotNil(t, rules[0].OutputMap)
+	assert.NotNil(t, rules[0].Map)
 }
