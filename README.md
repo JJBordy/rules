@@ -8,7 +8,7 @@ It uses yaml because of a fixed syntax which people can refer to online (not a s
 of verbosity to facilitate development of a GUI/client which can read and edit them. Also that way they are easy to
 store/transfer.
 
-Check the example file to see how it works.
+Check the example: `rules/example_test.go`
 
 ## short description
 

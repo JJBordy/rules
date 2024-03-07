@@ -1,9 +1,8 @@
-package example
+package rules
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/JJBordy/rules/rules"
 	"github.com/go-yaml/yaml"
 )
 
@@ -53,13 +52,13 @@ var simpleRuleYaml = `
 
 func ExampleEngine_simple() {
 
-	discountRules := make([]rules.RuleInput, 0)
+	discountRules := make([]RuleInput, 0)
 	err := yaml.Unmarshal([]byte(simpleRuleYaml), &discountRules)
 	if err != nil {
 		panic(err)
 	}
 
-	engine := rules.NewEngine()
+	engine := NewEngine()
 	err = engine.CreateSet("discount", discountRules)
 	if err != nil {
 		panic(err)

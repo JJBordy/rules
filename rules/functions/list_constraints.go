@@ -1,8 +1,8 @@
 package functions
 
-// constraints examples: at least fraction, at most fraction, all, none
-
 const (
+	// Valid values for constraints of list conditions
+
 	// All - all elements of the list should pass the functions (default)
 	All = "All"
 	// AtLeast - minimum elements in list to pass the functions

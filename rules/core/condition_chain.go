@@ -6,6 +6,8 @@ import (
 )
 
 const (
+	// Valid values for conditions chain
+
 	// AND - all conditions should be true for the rule to produce the output (default if none specified)
 	AND = "AND"
 	// OR - at least one condition should be true for the rule to pass

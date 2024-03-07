@@ -8,6 +8,8 @@ import (
 )
 
 const (
+	// Valid values for aggregate type
+
 	// MIN - minimum value in list
 	MIN = "MIN"
 	// MAX - maximum value in list
