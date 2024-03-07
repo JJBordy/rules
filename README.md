@@ -153,7 +153,7 @@ value, you can use the values from an output list.
     vip: golden
   OUTPUT_MAP:
     card.color: $customer.role
-    file.size: [ $customer.kbsize ]
+    group.roles.given: [ $customer.role ]
 ```
 
 The `MAP` property specifies a map of key/value pairs. In the `OUTPUT_MAP` property you can additionaly specify the
