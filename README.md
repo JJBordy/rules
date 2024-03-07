@@ -9,6 +9,9 @@ output will be different.
 
 The goal is to have well-defined and well explained schema for the conditions.
 
+## Rule example
+
+
 ### ROADMAP BEFORE 1.0:
 
 * process dates
