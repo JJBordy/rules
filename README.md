@@ -6,16 +6,16 @@ rule is fulfilled.
 
 Check the example file to see how it works.
 
-## Rule anatomy
+## rule anatomy
 
 Below will go through a rule line by line and will describe each of its elements.
 
-## Roadmap before 1.0:
+## roadmap before 1.0:
 
 * process dates
 * for function arguments: allow to pass input values, not just fixed values (Greater: [ config.max ])
 
-## Roadmap post 1.0:
+## roadmap post 1.0:
 
 * Rules will be able to have a priority (rules with higher priority will be executed latest and override any previous
   output)
