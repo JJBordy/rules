@@ -23,4 +23,3 @@
     file.color: $customer.age
   OUTPUT:
     file.size: 31
-# allow for input: $customer.age (from within the model)

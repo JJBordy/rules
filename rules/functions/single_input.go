@@ -8,55 +8,57 @@ import (
 )
 
 const (
+	// All functions can have arguments, they are represented in square brackets
+
 	// General functions
 
-	// Empty - the input is empty
+	// Empty [] - the input is empty
 	Empty = "Empty"
-	// NonEmpty - the input is not empty
+	// NonEmpty [] - the input is not empty
 	NonEmpty = "NonEmpty"
-	// Equal - the input is equal to the argument
+	// Equal [ any ] - the input is equal to the argument
 	Equal = "Equal"
 
 	// Numeric functions
 
-	// Greater - the input is a number and is greater than the argument
+	// Greater [nr] - the input is a number and is greater than the argument
 	Greater = "Greater"
-	// GreaterEq - the input is a number and is greater or equal to the argument
+	// GreaterEq [nr] - the input is a number and is greater or equal to the argument
 	GreaterEq = "GreaterEq"
-	// Lower - the input is a number and is lower than the argument
+	// Lower [nr] - the input is a number and is lower than the argument
 	Lower = "Lower"
-	// LowerEq - the input is a number and is lower or equal to the argument
+	// LowerEq [nr] - the input is a number and is lower or equal to the argument
 	LowerEq = "LowerEq"
-	// Between - the input is a number and is between the two arguments
+	// Between [nr] - the input is a number and is between the two arguments
 	Between = "Between"
-	// BetweenEq - the input is a number and is between or equal to the two arguments
+	// BetweenEq [nr] - the input is a number and is between or equal to the two arguments
 	BetweenEq = "BetweenEq"
-	// NotBetween - the input is a number and is not between the two arguments
+	// NotBetween [nr] - the input is a number and is not between the two arguments
 	NotBetween = "NotBetween"
-	// NotBetweenEq - the input is a number and is not between or equal to the two arguments
+	// NotBetweenEq [nr] - the input is a number and is not between or equal to the two arguments
 	NotBetweenEq = "NotBetweenEq"
 
 	// String functions
 
-	// EqualIgnoreCase - the input is equal to the argument; case-insensitive
+	// EqualIgnoreCase [str] - the input is equal to the argument; case-insensitive
 	EqualIgnoreCase = "EqualIgnoreCase"
-	// EqualAny - the input is equal to any of the arguments
+	// EqualAny [str...]- the input is equal to any of the arguments
 	EqualAny = "EqualAny"
-	// EqualAnyIgnoreCase - the input is equal to any of the arguments; case-insensitive
+	// EqualAnyIgnoreCase [str...] - the input is equal to any of the arguments; case-insensitive
 	EqualAnyIgnoreCase = "EqualAnyIgnoreCase"
-	// NotEqualAny - the input is not equal to any of the arguments
+	// NotEqualAny [str...] - the input is not equal to any of the arguments
 	NotEqualAny = "NotEqualAny"
-	// StartsWith - the input starts with the argument
+	// StartsWith [str] - the input starts with the argument
 	StartsWith = "StartsWith"
-	// StartsWithIgnoreCase - the input starts with the argument; case-insensitive
+	// StartsWithIgnoreCase [str] - the input starts with the argument; case-insensitive
 	StartsWithIgnoreCase = "StartsWithIgnoreCase"
-	// EndsWith - the input ends with the argument
+	// EndsWith [str] - the input ends with the argument
 	EndsWith = "EndsWith"
-	// EndsWithIgnoreCase - the input ends with the argument; case-insensitive
+	// EndsWithIgnoreCase [str] - the input ends with the argument; case-insensitive
 	EndsWithIgnoreCase = "EndsWithIgnoreCase"
-	// Contains - the input contains the argument
+	// Contains [str] - the input contains the argument
 	Contains = "Contains"
-	// ContainsIgnoreCase - the input contains the argument; case-insensitive
+	// ContainsIgnoreCase [str] - the input contains the argument; case-insensitive
 	ContainsIgnoreCase = "ContainsIgnoreCase"
 )
 
