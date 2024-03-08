@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// Condition chain types
 const (
 	// Valid values for conditions chain
 

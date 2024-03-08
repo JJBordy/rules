@@ -8,7 +8,7 @@ It uses yaml because of a fixed syntax which people can refer to online (not a s
 of verbosity to facilitate development of a GUI/client which can read and edit them. Also that way they are easy to
 store/transfer.
 
-Check the example: `rules/example_test.go`
+Check the example in [example_test.go](example_test.go)
 
 ## short description
 
@@ -33,8 +33,9 @@ It does not perform any calculations, except 'SUM' from a list of values.
 
 ## rule anatomy
 
-Below will go through a rule line by line and will describe each of its elements. The rule can be found in
-`testdata/rule-input.yaml`. Some values may not be exactly as there in order to showcase additional functionality.
+Below will go through a rule line by line and will describe each of its elements. The rule can be found
+in [testdata/rule-input.yaml](testdata/rule-input.yaml). Some values may not be exactly as there in order to showcase
+additional functionality.
 
 #### *name*
 
@@ -50,7 +51,7 @@ failed)
 Each rule has a set of conditions. By default, all conditions have to be fulfilled in order for the rule to generate its
 output (the default `chain` value is `AND`).
 
-The `chain` property can have any property of the logic gates operators. Documentation: `rules/core/condition_chain.go`
+The `chain` property can have any property of the logic gates operators. Documentation: [rules/core/condition_chain.go](rules/core/condition_chain.go)
 
 #### *conditions*
 
@@ -73,7 +74,8 @@ dot) which leads to a value in the input to the engine.
 
 The `functions` property contains a map of functions which evaluate the value specified in the input path. Multiple
 functions can be added under the same conditions.
-The list of all functions are here: `rules/functions/single_input.go`
+The list of all functions are here: [rules/functions/single_input.go](rules/functions/single_input.go). You can also create your own functions and add
+them to the engine, with: `rules.NewEngineCustom()`
 
 The arguments for all the functions are specified inside square brackets. Even if there are no arguments, the square
 brackets should be there.
@@ -99,7 +101,7 @@ are in the single conditions.
 
 By default, all elements of the list will have to pass all the functions. If you want to change that logic and have only
 a certain number of elements in the list pass the functions, you can use `constraints`.
-All of them are documented here: `rules/functions/list_constraints.go`
+All of them are documented here: [rules/functions/list_constraints.go](rules/functions/list_constraints.go)
 
 #### *aggregate conditions*
 
@@ -115,7 +117,7 @@ The `aggregate` property specifies aggregate conditions, they also refer to list
 refer to each element one by one, the `aggregate` conditions refer to them as a whole.
 
 The `type` property specifies the aggregate type. All possible values are documented
-here: `rules/functions/aggregate.go`
+here: [rules/functions/aggregate.go](rules/functions/aggregate.go)
 
 The `functions` property specifies the functions that are used to evaluate the result of the aggregate. They are the
 same as for single and list conditions.

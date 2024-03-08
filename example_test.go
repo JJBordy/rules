@@ -1,12 +1,13 @@
-package rules
+package main
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/JJBordy/rules/rules"
 	"github.com/go-yaml/yaml"
 )
 
-var simpleRuleYaml = `
+var rulesAsYAML = `
 - name: Setting default values for the output
   conditions:
     single:
@@ -52,18 +53,22 @@ var simpleRuleYaml = `
 
 func ExampleEngine_simple() {
 
-	discountRules := make([]RuleInput, 0)
-	err := yaml.Unmarshal([]byte(simpleRuleYaml), &discountRules)
+	// reading and unmarshalling the rules as rules.RuleInput
+	discountRules := make([]rules.RuleInput, 0)
+	err := yaml.Unmarshal([]byte(rulesAsYAML), &discountRules)
 	if err != nil {
 		panic(err)
 	}
 
-	engine := NewEngine()
+	// creating a new engine
+	engine := rules.NewEngine()
+	// creating a set with the rules
 	err = engine.CreateSet("discount", discountRules)
 	if err != nil {
 		panic(err)
 	}
 
+	// INPUT A: rule engine input (your custom data)
 	customerA := map[string]any{
 		"customer": map[string]any{
 			"name":       "John",
@@ -77,17 +82,20 @@ func ExampleEngine_simple() {
 		},
 	}
 
+	// evaluating the input against the rules specified for the set
 	outputA, err := engine.EvaluateSet("discount", customerA)
 	if err != nil {
 		panic(err)
 	}
 
+	// converting the output to JSON and printing it to the console
 	outputJSONforA, err := json.Marshal(outputA)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(fmt.Sprint(string(outputJSONforA)))
+	fmt.Println("OUTPUT A:", string(outputJSONforA))
 
+	// INPUT B: rule engine input (your custom data)
 	customerB := map[string]any{
 		"customer": map[string]any{
 			"name":       "Mike",
@@ -104,17 +112,20 @@ func ExampleEngine_simple() {
 		},
 	}
 
+	// evaluating the input against the rules specified for the set
 	outputB, err := engine.EvaluateSet("discount", customerB)
 	if err != nil {
 		panic(err)
 	}
 
+	// converting the output to JSON and printing it to the console
 	outputJSONforB, err := json.Marshal(outputB)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(fmt.Sprint(string(outputJSONforB)))
+	fmt.Println("OUTPUT B:", string(outputJSONforB))
 
+	// INPUT C: rule engine input (your custom data)
 	customerC := map[string]any{
 		"customer": map[string]any{
 			"name":       "Stan",
@@ -134,18 +145,21 @@ func ExampleEngine_simple() {
 		},
 	}
 
+	// evaluating the input against the rules specified for the set
 	outputC, err := engine.EvaluateSet("discount", customerC)
 	if err != nil {
 		panic(err)
 	}
 
+	// converting the output to JSON and printing it to the console
 	outputJSONforC, err := json.Marshal(outputC)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(fmt.Sprint(string(outputJSONforC)))
+	fmt.Println("OUTPUT C:", string(outputJSONforC))
 
-	// Output: {"packaging":{"style":"simple"}}
-	// {"discount":{"add":[3]},"packaging":{"style":"premium"}}
-	// {"discount":{"add":[5,3]},"packaging":{"style":"premium"}}
+	// Output:
+	// OUTPUT A: {"packaging":{"style":"simple"}}
+	// OUTPUT B: {"discount":{"add":[3]},"packaging":{"style":"premium"}}
+	// OUTPUT C: {"discount":{"add":[5,3]},"packaging":{"style":"premium"}}
 }

@@ -1,5 +1,6 @@
 package rules
 
+// RuleInput - definition of a single rule. The structure into which the yaml rules are deserialized.
 type RuleInput struct {
 	Name                string `yaml:"name"`
 	ConditionsChainType string `yaml:"chain"`

@@ -7,10 +7,9 @@ import (
 	"strings"
 )
 
+// General functions
 const (
 	// All functions can have arguments, they are represented in square brackets
-
-	// General functions
 
 	// Empty [] - the input is empty
 	Empty = "Empty"
