@@ -1,5 +1,7 @@
 # rules
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/JJBordy/rules.svg)](https://pkg.go.dev/github.com/JJBordy/rules)
+
 Minimal rules engine.
 
 It's purpose is to allow non-programmers to edit and provide business rules which will generate a specific output.
