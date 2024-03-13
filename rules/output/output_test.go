@@ -2,7 +2,7 @@ package output
 
 import (
 	"fmt"
-	"github.com/go-yaml/yaml"
+	"gopkg.in/yaml.v3"
 	"strings"
 	"testing"
 )

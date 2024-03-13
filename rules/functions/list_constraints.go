@@ -2,19 +2,19 @@ package functions
 
 // Valid values for constraints of list conditions
 const (
-	// All - all elements of the list should pass the functions (default)
+	// All [] - all elements of the list should pass the functions (default)
 	All = "All"
-	// AtLeast - minimum elements in list to pass the functions
+	// AtLeast [int] - minimum elements in list to pass the functions
 	AtLeast = "AtLeast"
-	// AtMost - maximum elements in list to pass the functions
+	// AtMost [int] - maximum elements in list to pass the functions
 	AtMost = "AtMost"
-	// Exactly - exact number of elements in list to pass the functions
+	// Exactly [int] - exact number of elements in list to pass the functions
 	Exactly = "Exactly"
-	// None - no elements in list should pass the functions
+	// None [] - no elements in list should pass the functions
 	None = "None"
-	// AtLeastFraction - minimum fraction of elements in list to pass the functions (1,2) = 50%, (3,4) - 75%
+	// AtLeastFraction [int,int] - minimum fraction of elements in list to pass the functions (1,2) = 50%, (3,4) - 75%
 	AtLeastFraction = "AtLeastFraction"
-	// AtMostFraction - maximum fraction of elements in list to pass the functions (1,2) = 50%, (3,4) - 75%
+	// AtMostFraction  [int,int] - maximum fraction of elements in list to pass the functions (1,2) = 50%, (3,4) - 75%
 	AtMostFraction = "AtMostFraction"
 )
 

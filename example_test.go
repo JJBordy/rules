@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/JJBordy/rules/rules"
-	"github.com/go-yaml/yaml"
+	"gopkg.in/yaml.v3"
 )
 
 var rulesAsYAML = `

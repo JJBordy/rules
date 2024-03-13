@@ -2,8 +2,8 @@ package rules
 
 import (
 	"github.com/JJBordy/rules/rules/functions"
-	"github.com/go-yaml/yaml"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/yaml.v3"
 	"os"
 	"testing"
 )
